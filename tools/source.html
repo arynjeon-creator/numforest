@@ -116,6 +116,13 @@ button.chip:active{transform:translateY(2px)}
 .rule-card h3{margin:0 0 6px;font-family:var(--font-display);font-size:24px}
 .rule-card p{margin:4px 0;font-size:18px;line-height:1.55}
 .rule-card .ic{font-size:26px;margin-right:6px}
+.dialog.goal{max-width:620px;text-align:center}
+.goal-top{display:flex;align-items:center;justify-content:center;gap:10px}
+.goal-top .av{width:84px;height:84px}
+.goal-stage{font-family:var(--font-display);font-size:22px;color:var(--grass-deep);background:var(--paper,#F4FAEF);border-radius:999px;padding:4px 14px}
+.goal-text{font-family:var(--font-display);font-size:clamp(28px,4.6vw,40px);line-height:1.35;margin:10px 0 4px;color:var(--ink);word-break:keep-all}
+.goal-sub{font-size:18px;color:var(--ink-soft);margin:0 0 6px;word-break:keep-all}
+.goal-sub .dia{width:22px;height:22px;vertical-align:-4px}
 .rule-card .ic svg{width:28px;height:28px;vertical-align:-5px}
 .mine{display:flex;flex-wrap:wrap;gap:10px}
 .mine span{background:#FFF4D6;border-radius:12px;padding:6px 12px;font-size:17px}
@@ -751,6 +758,14 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
     <p id="clearText" style="margin:0;font-size:18px;line-height:1.5"></p>
     <button class="big" id="clearOk" type="button">다음</button>
     <button class="btn" id="clearMap" type="button">지도로 가기</button>
+  </div>
+</div>
+<div class="overlay" id="goalBox" hidden>
+  <div class="dialog goal" role="dialog" aria-modal="true" aria-labelledby="goalText">
+    <div class="goal-top"><div class="av" id="goalMon"></div><span class="goal-stage" id="goalStage"></span></div>
+    <p class="goal-text" id="goalText"></p>
+    <p class="goal-sub" id="goalSub"></p>
+    <button class="big" id="goalGo" type="button">시작!</button>
   </div>
 </div>
 <div class="overlay" id="celeBox" hidden>
@@ -1969,7 +1984,37 @@ function startStage(i){
   show('play');setScene(st.key);
   $('guideMon').innerHTML=avatarHTML(partner());
   loadProblem(true);startTicker();
+  /* 스테이지 목표: 처음 시작할 때만 큰 글씨로 (이어서 풀 때는 바로) */
+  if(st.idx===0&&!st.w&&!st.goalSeen)showGoal(st);
 }
+/* 스테이지 목표 문장: 그날 실제 문제에 맞춰 만듦. 레벨·카드라는 말은 쓰지 않음 */
+function stageGoal(st){
+  const t=T(),nm=lv=>(C.LEVELS[lv]||{}).name||'',uniq=a=>[...new Set(a)];
+  const lvs=uniq(st.probs.filter(p=>!p.redo).map(p=>p.lv)),names=uniq(lvs.map(nm));
+  const one=names.length===1?names[0]:'배운 계산';
+  const game=(st.probs.find(p=>!p.redo)||{}).game;
+  switch(st.key){
+    case 'warm':{const SL=x=>x==='2학년'?'2학년':x.replace('-','학년 ')+'학기',sems=C.SEMS.filter(x=>lvs.some(l=>(C.LEVELS[l]||{}).sem===x)),when=sems.length&&sems.length<=2?sems.map(SL).join('과 ')+(sems.length===1&&sems[0]==='2학년'?' 때':'에')+' 배운':'전에 배운';
+      return {text:`몸풀기! ${when} 계산을 번개처럼 빠르게 풀어 보자`,sub:names.length?'오늘은 '+names.slice(0,3).join(', '):''};}
+    case 'today1':return t.daji?{text:'이번 학기에 배운 계산을 섞어서 세로셈으로 연습해 보자',sub:''}:{text:`${josa(one,'을를')} ${game==='vert'?'세로셈으로 ':''}연습해 보자`,sub:game==='vert'?'자리를 잘 맞춰서 풀어 봐':''};
+    case 'today2':{
+      if(st.card&&st.card!=='mix'&&C.CARDS[st.card]){const c=C.CARDS[st.card];return {text:`${josa(nm(c.lv),'을를')} 이번엔 새로운 방법으로 풀어 보자`,sub:'방법: '+c.name};}
+      if(st.card==='mix')return {text:`${josa(t.daji?'이번 학기에 배운 계산':one,'을를')} 여러 가지 방법으로 풀어 보자`,sub:'지금까지 해 본 방법을 떠올려 봐'};
+      return {text:`${josa(one,'을를')} 한 번 더 연습해 보자`,sub:''};}
+    case 'today3':return game==='horiz'?{text:`${josa(t.daji?'배운 계산':one,'을를')} 가로셈으로 풀어 보자`,sub:'머릿속으로 자리를 맞춰 봐'}:{text:`${josa(t.daji?'배운 계산':one,'을를')} 한 번 더 연습해 보자`,sub:'마지막 언덕이야, 힘내!'};
+    case 'review':{const n=st.probs.filter(p=>p.redo).length;
+      return n?{text:`어제 틀렸던 문제 ${n}개를 다시 풀어 보자`,sub:'전에 배운 계산도 함께 복습해'}:{text:'전에 배운 계산을 다시 풀어 보자',sub:'잊지 않게 한 번 더!'};}
+  }
+  return {text:'같이 풀어 보자!',sub:''};
+}
+function showGoal(st){
+  const g=stageGoal(st);
+  $('goalMon').innerHTML=avatarHTML(partner());$('goalStage').textContent=st.name;
+  $('goalText').textContent=g.text;
+  $('goalSub').innerHTML=(g.sub?esc(g.sub)+'<br>':'')+`${st.probs.length}문제를 모두 한 번에 맞히면 ${diaSVG(true)}`;
+  $('goalBox').hidden=false;$('goalGo').focus();
+}
+$('goalGo').onclick=()=>{$('goalBox').hidden=true;const st=T()&&T().stages[P.si];if(st){st.goalSeen=true;save();}P.t0=Date.now();tone(SND.tap);};
 function loadProblem(first){
   closeMemoPad();
   if(P.mode==='prac')return loadPracProblem(first);
@@ -2105,7 +2150,7 @@ $('problem').addEventListener('click',e=>{
   if(e.target.closest('#dealReset')){P.dealt=0;renderProblem();}
 });
 function maxLen(){return P.p.game==='vert'?C.vertCols(P.p):P.p.game==='card'?(BOXLEN[P.af]||6):5;}
-function overlayOpen(){return !$('celeBox').hidden||!$('stampBox').hidden||!$('clearBox').hidden||!$('explainBox').hidden||!$('gateBox').hidden||!$('momBox').hidden;}
+function overlayOpen(){return !$('goalBox').hidden||!$('celeBox').hidden||!$('stampBox').hidden||!$('clearBox').hidden||!$('explainBox').hidden||!$('gateBox').hidden||!$('momBox').hidden;}
 function giveCandy(){
   if(P.mode==='mission'){state.candy++;return true;}
   const pc=state.pracCandy,td=todayStr();if(pc.date!==td){pc.date=td;pc.n=0;}
