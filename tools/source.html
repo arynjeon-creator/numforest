@@ -116,6 +116,7 @@ button.chip:active{transform:translateY(2px)}
 .rule-card h3{margin:0 0 6px;font-family:var(--font-display);font-size:24px}
 .rule-card p{margin:4px 0;font-size:18px;line-height:1.55}
 .rule-card .ic{font-size:26px;margin-right:6px}
+.rule-card .ic svg{width:28px;height:28px;vertical-align:-5px}
 .mine{display:flex;flex-wrap:wrap;gap:10px}
 .mine span{background:#FFF4D6;border-radius:12px;padding:6px 12px;font-size:17px}
 .cbox{display:flex;flex-direction:column;gap:12px;align-items:center;font-family:var(--font-display);font-size:clamp(24px,4vw,38px);font-variant-numeric:tabular-nums}
@@ -186,6 +187,8 @@ button.chip:active{transform:translateY(2px)}
 .dialog .answer{font-family:var(--font-display);font-size:24px;color:var(--grass-deep)}
 .stars{display:flex;gap:6px}
 .stars svg{width:60px;height:60px}
+.stars svg.big{width:84px;height:84px}
+.stars svg.dia.on{animation:pop .5s backwards;filter:drop-shadow(0 0 8px rgba(143,219,255,.9))}
 .stars .on{animation:pop .5s backwards}
 .stars .on:nth-child(2){animation-delay:.15s}.stars .on:nth-child(3){animation-delay:.3s}
 @keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.25)}100%{transform:scale(1)}}
@@ -369,7 +372,7 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
       <button class="chip menu" id="toFree" type="button">자유 연습</button>
       <button class="chip menu" id="toGrow" type="button">실력 쑥쑥 연습</button>
       <button class="chip menu" id="toRules" type="button">게임 규칙</button>
-      <span class="chip candy" id="candyChip" title="별사탕"></span>
+      <span class="chip candy" id="candyChip" title="별"></span>
       <button class="chip" id="toDeco" type="button">꾸미기</button>
       <button class="chip" id="toCol" type="button">도감 <span id="colCount"></span></button>
       <button class="chip" id="soundBtn" type="button">소리 켬</button>
@@ -458,7 +461,7 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
       <div class="deco-right">
         <div class="tabs" id="slotTabs"></div>
         <div class="items" id="itemGrid"></div>
-        <p class="note">별사탕은 문제를 한 번에 맞힐 때마다 1개씩 받아요. 별이 붙은 아이템은 특별 선물로만 받을 수 있어요.</p>
+        <p class="note">별은 문제를 한 번에 맞힐 때마다 1개씩 받아요.</p>
       </div>
     </div>
   </section>
@@ -516,7 +519,7 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
       <p id="repLevel"></p>
     </div>
     <div class="panel">
-      <h2>다르게 풀기 카드 <span class="tag">지금 레벨 · 8문제 중 7개를 한 번에 맞히면 스티커</span></h2>
+      <h2>다르게 풀기 카드 <span class="tag">엄마만 보는 정보 · 개울 건너기 8문제 중 7개를 한 번에 맞히면 통과</span></h2>
       <div class="tbl" id="repCards"></div>
     </div>
     <div class="panel">
@@ -528,7 +531,7 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
       <p>보낸 말은 아이가 다음에 앱을 열 때 짝꿍이 전해 줘요. 다른 태블릿에서도 기록 맞추기로 전달돼요.</p>
       <label for="msgText" class="vis">보낼 말</label>
       <textarea class="textin" id="msgText" rows="2" maxlength="80" placeholder="예: 오늘 뺄셈 정말 잘했어! 사랑해"></textarea>
-      <div class="row"><label for="msgCandy">별사탕 선물</label>
+      <div class="row"><label for="msgCandy">별 선물</label>
         <select class="sel" id="msgCandy"><option value="0">없음</option><option value="5">5개</option><option value="10">10개</option><option value="20">20개</option></select>
         <button class="btn primary" id="msgSend" type="button">보내기</button></div>
       <p class="msg" id="msgMsg" aria-live="polite"></p>
@@ -591,7 +594,7 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
           <label><input type="radio" name="auto" value="off" id="autoOff"> 올리지 않기</label>
         </div>
       </div>
-      <p>같은 레벨·단계로 3일 연속 미션을 끝내고 기본 계산(꽃길 산책·언덕 오르기) 별 평균이 2.5개 이상이면 다음 단계로 올라가요. 3단계에서는 그 레벨의 다르게 풀기 카드 스티커를 모두 모아야 다음 레벨로 올라가요(레벨 졸업).</p>
+      <p>같은 레벨·단계로 3일 연속 미션을 끝내고 기본 계산(꽃길 산책·언덕 오르기) 한 번에 맞힌 문제가 평균 8개 중 7개 이상이면 다음 단계로 올라가요. 3단계에서는 그 레벨의 다르게 풀기 카드를 모두 통과해야(카드마다 8개 중 7개를 한 번에) 다음 레벨로 올라가요(레벨 졸업). 레벨·단계·카드는 엄마 화면에만 보이고, 아이에게는 보이지 않아요.</p>
       <p id="semNote" class="note"></p>
       <div class="tbl"><table id="lvTable"></table></div>
       <div class="pv" id="previewBox" hidden></div>
@@ -660,13 +663,13 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
         <label><input type="radio" name="prange" value="open" id="prOpen"> 현재 레벨과 복습 범위만 고를 수 있게</label>
         <label><input type="radio" name="prange" value="all" id="prAll"> 열려 있는 모든 레벨 (Lv1~12)</label>
       </div>
-      <p>연습에서는 한 번에 맞힌 문제마다 별사탕을 받지만, 하루 최대 20개까지예요. 도장은 오늘의 미션을 끝낼 때만 받아요.</p>
+      <p>연습에서는 한 번에 맞힌 문제마다 별을 받지만, 하루 최대 20개까지예요. 도장은 오늘의 미션을 끝낼 때만 받아요.</p>
       <div class="tbl"><table id="pracTable"></table></div>
     </div>
 
     <div class="panel">
-      <h2>별사탕 선물</h2>
-      <p>칭찬하고 싶을 때 별사탕을 보낼 수 있어요. 아이가 다음에 앱을 열면 짝꿍이 전해 줘요. 지금 <span id="giftNow"></span>개.</p>
+      <h2>별 선물</h2>
+      <p>칭찬하고 싶을 때 별을 보낼 수 있어요. 아이가 다음에 앱을 열면 짝꿍이 전해 줘요. 지금 <span id="giftNow"></span>개.</p>
       <div class="tools"><button class="btn" data-gift="5" type="button">+5</button><button class="btn" data-gift="10" type="button">+10</button><button class="btn" data-gift="20" type="button">+20</button></div>
     </div>
 
@@ -729,8 +732,8 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
         <button class="btn" id="tSkip" type="button">지금 스테이지 바로 끝내기</button>
         <button class="btn" id="tEgg" type="button">황금 알 바로 받기</button>
         <button class="btn" id="tStamp" type="button">도장 +5</button>
-        <button class="btn" id="tCards" type="button">지금 레벨 카드 스티커 모두 받기</button>
-        <button class="btn" id="tCandy" type="button">별사탕 +100</button>
+        <button class="btn" id="tCards" type="button">지금 레벨 카드 모두 통과로</button>
+        <button class="btn" id="tCandy" type="button">별 +100</button>
         <button class="btn" id="tUp" type="button">3일 연속 잘한 기록 넣기</button>
         <button class="btn warn" id="tClear" type="button">도감 비우기</button>
         <button class="btn warn" id="tAll" type="button">모든 기록 지우기</button>
@@ -1465,7 +1468,7 @@ const ITEMS=[
  {id:'shades',slot:'face',name:'선글라스',price:50,x:50,y:52,w:58,svg:`<svg viewBox="0 0 100 40"><rect x="8" y="6" width="36" height="26" rx="12" fill="#24384A" ${OL}/><rect x="56" y="6" width="36" height="26" rx="12" fill="#24384A" ${OL}/><path d="M44 16 H56" stroke="#2E4057" stroke-width="5"/><path d="M15 13 L24 13" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".7"/><path d="M63 13 L72 13" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".7"/></svg>`},
  {id:'bowtie',slot:'neck',name:'나비넥타이',price:50,x:50,y:84,w:34,svg:`<svg viewBox="0 0 100 50"><path d="M50 25 L10 5 V45Z" fill="#E8505B" ${OL}/><path d="M50 25 L90 5 V45Z" fill="#E8505B" ${OL}/><rect x="41" y="15" width="18" height="20" rx="6" fill="#C73A46" ${OL}/></svg>`},
  {id:'scarf',slot:'neck',name:'목도리',price:50,x:50,y:80,w:64,svg:`<svg viewBox="0 0 100 56"><path d="M66 28 L74 54 L86 50 L80 24Z" fill="#6CC58F" ${OL}/><path d="M6 10 Q50 34 94 10 L94 24 Q50 48 6 24Z" fill="#6CC58F" ${OL}/><path d="M30 22 L34 34 M50 26 L50 38 M70 22 L66 34" stroke="#3E9D68" stroke-width="4"/></svg>`},
- {id:'medal',slot:'neck',name:'메달',special:'단계가 오를 때 선물',x:50,y:84,w:24,svg:`<svg viewBox="0 0 60 84"><path d="M12 0 L30 34 L48 0" fill="none" stroke="#5E8BD6" stroke-width="10"/><circle cx="30" cy="56" r="22" fill="#FFC845" ${OL}/><path d="M30 42 l4 8.5 9 1 -6.7 6.2 1.9 8.9 -8.2-4.6 -8.2 4.6 1.9-8.9 -6.7-6.2 9-1z" fill="#FFF3CC"/></svg>`},
+ {id:'medal',slot:'neck',name:'메달',price:50,x:50,y:84,w:24,svg:`<svg viewBox="0 0 60 84"><path d="M12 0 L30 34 L48 0" fill="none" stroke="#5E8BD6" stroke-width="10"/><circle cx="30" cy="56" r="22" fill="#FFC845" ${OL}/><path d="M30 42 l4 8.5 9 1 -6.7 6.2 1.9 8.9 -8.2-4.6 -8.2 4.6 1.9-8.9 -6.7-6.2 9-1z" fill="#FFF3CC"/></svg>`},
  {id:'balloon',slot:'hand',name:'풍선',price:30,x:90,y:36,w:26,svg:`<svg viewBox="0 0 60 120"><path d="M30 64 Q22 86 34 118" stroke="#2E4057" fill="none" stroke-width="3"/><ellipse cx="30" cy="34" rx="25" ry="30" fill="#FF7E6B" ${OL}/><path d="M25 63 L35 63 L30 70Z" fill="#FF7E6B" ${OL}/><ellipse cx="20" cy="22" rx="6" ry="10" fill="#fff" opacity=".5"/></svg>`},
  {id:'bgforest',slot:'bg',name:'숲 배경',price:100,svg:`<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><rect width="100" height="100" fill="#DDF3E4"/><circle cx="15" cy="22" r="9" fill="#fff" opacity=".8"/><circle cx="24" cy="20" r="7" fill="#fff" opacity=".8"/><circle cx="18" cy="100" r="42" fill="#A6E0BC"/><circle cx="84" cy="104" r="46" fill="#8BD3A8"/><circle cx="86" cy="30" r="7" fill="#FFC845"/></svg>`},
  {id:'bgspace',slot:'bg',name:'우주 배경',price:100,svg:`<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><rect width="100" height="100" fill="#2B2F5E"/><g fill="#fff"><circle cx="12" cy="14" r="1.6"/><circle cx="40" cy="8" r="1"/><circle cx="70" cy="18" r="1.4"/><circle cx="90" cy="60" r="1.2"/><circle cx="8" cy="70" r="1.2"/><circle cx="30" cy="90" r="1.6"/><circle cx="62" cy="92" r="1"/></g><circle cx="84" cy="22" r="10" fill="#FF9A73"/><ellipse cx="84" cy="22" rx="16" ry="4" fill="none" stroke="#FFC845" stroke-width="2"/></svg>`},
@@ -1661,7 +1664,7 @@ function pool(){
 }
 function findChar(id){if(id==='guide')return GUIDE;return chars.find(c=>c.id===id)||BUILTIN.find(c=>c.id===id)||DEFAULTS.find(c=>c.id===id)||(id==='gold'?GOLD:null);}
 function partner(){const p=state.partner&&state.col.includes(state.partner)?findChar(state.partner):null;return p||GUIDE;}
-/* v2.1: 임시 친구(코드 그림 8마리·황금별냥) → 앱 친구 5마리로 옮기기. 모은 수만큼 앞에서부터, 넘치면 별사탕 60씩 */
+/* v2.1: 임시 친구(코드 그림 8마리·황금별냥) → 앱 친구 5마리로 옮기기. 모은 수만큼 앞에서부터, 넘치면 별 60씩 */
 function migrateFriends(){
   if(state.mig2)return;
   const tmp=id=>/^m\d$/.test(id)||id==='gold';
@@ -1775,7 +1778,11 @@ function avatarHTML(ch){
   return h+'</div>';
 }
 function starSVG(on){return `<svg viewBox="0 0 24 24" class="${on?'on':''}"><path d="M12 2l2.9 6.2 6.8.8-5 4.7 1.3 6.7L12 17.1 6 20.4l1.3-6.7-5-4.7 6.8-.8z" fill="${on?'var(--sun)':'var(--lock)'}" stroke="${on?'#E0A520':'none'}" stroke-width="1.2" stroke-linejoin="round"/></svg>`;}
-const CANDY_IC=`<svg class="candy-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.2 6.8.8-5 4.7 1.3 6.7L12 17.1 6 20.4l1.3-6.7-5-4.7 6.8-.8z" fill="#FF9AB8" stroke="#D4709A" stroke-width="1.2" stroke-linejoin="round"/></svg>`;
+const CANDY_IC=`<svg class="candy-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.2 6.8.8-5 4.7 1.3 6.7L12 17.1 6 20.4l1.3-6.7-5-4.7 6.8-.8z" fill="var(--sun)" stroke="#E0A520" stroke-width="1.2" stroke-linejoin="round"/></svg>`;
+/* 다이아몬드: 스테이지 8문제를 모두 한 번에 맞히면 (모으지 않는 칭찬 표시) */
+const DIA_PATH='M6.5 3h11l4.5 6-10 12.5L2 9z',DIA_LINES='M2 9h20M9.5 3L7.5 9l4.5 12.5L16.5 9l-2-6';
+function diaSVG(on,cls){return `<svg viewBox="0 0 24 24" class="dia${on?' on':''} ${cls||''}" aria-hidden="true"><path d="${DIA_PATH}" fill="${on?'#8FDBFF':'var(--lock)'}" stroke="${on?'#2C8FC4':'#B9C0C8'}" stroke-width="1.3" stroke-linejoin="round"/><path d="${DIA_LINES}" fill="none" stroke="${on?'#2C8FC4':'#B9C0C8'}" stroke-width="1" opacity=".7"/>${on?'<path d="M7 7.5l1.2-2.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/>':''}</svg>`;}
+const perfect=st=>st.stars>0&&st.first>=st.probs.length;
 let toastT=null;
 function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,2000);}
 function armBtn(btn,fn,label){
@@ -1836,13 +1843,13 @@ function showCele(){
 $('celeOk').onclick=()=>{$('celeBox').hidden=true;delete state.cele;save();};
 function renderHome(){
   ensureToday();
-  setTimeout(showCele,400);
+  if(state.cele){delete state.cele;}
   const t=T(),s=state.set,L=C.LEVELS[s.cur];
   $('candyChip').innerHTML=CANDY_IC+' '+state.candy;
   const P=pool(),own=state.col.filter(id=>P.some(c=>c.id===id)||(id==='gold'&&useGold())).length;
   $('colCount').textContent=own+'/'+(P.length+(useGold()?1:0));
   const tl=t.lv||s.cur,ts=t.step||s.step,TL=C.LEVELS[tl];
-  $('lvTag').textContent=C.WORLDS[TL.w].name+' · '+TL.name;
+  $('lvTag').textContent='';$('lvTag').hidden=true;  /* v2.2: 레벨 이름은 엄마 화면에만 */
   const dc=doneCount(),tc=totalCount();
   $('todayMeta').textContent=dc+'/'+tc+'문제 · '+Math.floor(t.sec/60)+'분';
   const p=partner();
@@ -1870,7 +1877,7 @@ function renderHome(){
       <text x="${x}" y="${y+17}" text-anchor="middle" font-family="Jua,sans-serif" font-size="48" fill="${locked?'#fff':'var(--ink)'}">${i+1}</text>
       <text x="${x}" y="${y+88}" text-anchor="middle" font-family="Jua,sans-serif" font-size="22" fill="var(--ink)">${sg.name}</text>
       ${sub?`<text x="${x}" y="${y+114}" text-anchor="middle" font-family="Gowun Dodum,sans-serif" font-size="19" fill="var(--ink-soft)">${sub}</text>`:''}`;
-    if(done){for(let k=0;k<3;k++)svg+=`<g transform="translate(${x-40+k*28},${y-92}) scale(1.05)"><path d="M12 2l2.9 6.2 6.8.8-5 4.7 1.3 6.7L12 17.1 6 20.4l1.3-6.7-5-4.7 6.8-.8z" fill="${k<sg.stars?'var(--sun)':'var(--lock)'}"/></g>`;}
+    if(done&&perfect(sg))svg+=`<g transform="translate(${x-20},${y-100}) scale(1.7)"><path d="${DIA_PATH}" fill="#8FDBFF" stroke="#2C8FC4" stroke-width="1.3" stroke-linejoin="round"/><path d="${DIA_LINES}" fill="none" stroke="#2C8FC4" stroke-width="1" opacity=".7"/></g>`;
     svg+='</g>';
   });
   /* 지도 끝: 도장판 (도장 30개를 채우면 황금 알) */
@@ -1895,7 +1902,7 @@ function openStamps(fresh){
   const dj=state.dojang,t=T(),n=dj.board.length,sk=streakNow();
   if(t&&t.done){t.stampSeen=true;save();}
   $('stampGrid').innerHTML=Array.from({length:BOARD},(_,i)=>{const x=dj.board[i];const isNew=fresh&&x&&t&&x.d===t.date;
-    return `<span class="stc${x?(x.g?' gold':' on'):''}${isNew?' new':''}" title="${x?x.d:''}">${x?(x.g?'★':'참'):i+1}</span>`;}).join('');
+    return `<span class="stc${x?(x.g?' gold':' on'):''}${isNew?' new':''}" title="${x?x.d:''}">${x?'참':i+1}</span>`;}).join('');
   $('stampText').innerHTML=dj.eggs>0?'도장판을 다 채웠어요! <b>황금 알</b>을 열어서 새 친구를 만나요.':
     `새 친구까지 도장 <b>${BOARD-n}개</b> · 연속 ${sk}일 (금도장까지 ${7-(sk%7)}일)`;
   $('stampEgg').hidden=!(dj.eggs>0);
@@ -1906,14 +1913,13 @@ function renderRules(){
   ensureToday();const p=partner(),dj=state.dojang,s=state.set,sk=streakNow(),n8=state.set.counts[2]||8;
   $('rulesMon').innerHTML=avatarHTML(p);
   $('rulesBubble').innerHTML=`<b>${esc(p.name)}</b><br>까먹어도 괜찮아! 내가 다시 알려 줄게.`;
-  const cards=lvCards(s.cur),got=cards.filter(hasSticker).length;
+  const dia=diaSVG(true,'ric');
   $('rulesBody').innerHTML=`
-    <div class="rule-card"><h3><span class="ic">🍬</span>별사탕</h3><p>문제를 <b>한 번에</b> 맞히면 별사탕 <b>1개</b>!</p><p>별사탕으로 꾸미기 방에서 짝꿍을 꾸밀 수 있어. 연습에서는 하루에 ${20}개까지 받아.</p></div>
-    <div class="rule-card"><h3><span class="ic">📮</span>도장</h3><p>오늘의 미션 5개를 다 끝내면 도장 <b>1개</b>!</p><p><b>7일 연속</b>으로 하면 금도장을 하나 더 줄게! 하루 쉬면 연속은 1일부터 다시지만, 모은 도장은 그대로야.</p><p>도장 <b>${BOARD}개</b>가 모이면 황금 알에서 <b>새 친구</b>가 나와. 친구를 다 모았으면 알에서 별사탕 60개가 나와.</p></div>
-    <div class="rule-card"><h3><span class="ic">🃏</span>카드 스티커</h3><p>개울 건너기에서는 <b>다르게 풀기 카드</b>를 해.</p><p>${n8}문제 중 <b>${STICKER_N(n8)}개</b>를 <b>한 번에</b> 맞히면 카드 스티커! 못 받으면 다음 날 다시 도전해.</p></div>
-    <div class="rule-card"><h3><span class="ic">⭐</span>별</h3><p>스테이지마다 한 번에 다 맞히면 별 3개, ${n8}문제 중 ${Math.ceil(n8*0.75)}개 이상 맞히면 별 2개, 그보다 적으면 별 1개.</p></div>
-    <div class="rule-card"><h3><span class="ic">🌳</span>오늘의 탐험</h3><p>신발 끈 묶기 → 꽃길 산책 → 개울 건너기(카드) → 언덕 오르기 → 기억 열매 따기</p><p>틀리면 다시 기회가 있고, 두 번 틀리면 힌트, 세 번 틀리면 같이 풀어 봐.</p></div>
-    <div class="rule-card"><h3><span class="ic">🧭</span>내 기록</h3><div class="mine"><span>별사탕 ${state.candy}개</span><span>도장 ${dj.board.length}/${BOARD}</span><span>연속 ${sk}일</span><span>카드 스티커 ${got}/${cards.length||0}</span><span>도감 ${$('colCount').textContent}</span></div></div>`;
+    <div class="rule-card"><h3><span class="ic">${CANDY_IC}</span>별</h3><p>문제를 <b>한 번에</b> 맞히면 별 <b>1개</b>!</p><p>별로 꾸미기 방에서 짝꿍을 꾸밀 수 있어. 연습에서는 하루에 20개까지 받아.</p></div>
+    <div class="rule-card"><h3><span class="ic">${dia}</span>다이아몬드</h3><p>스테이지 ${n8}문제를 <b>하나도 안 틀리고</b> 모두 한 번에 맞히면 반짝 다이아몬드!</p><p>다이아몬드는 지도에 반짝여. 오늘 몇 개를 반짝이게 할 수 있을까?</p></div>
+    <div class="rule-card"><h3><span class="ic">📮</span>도장</h3><p>오늘의 미션 5개를 다 끝내면 도장 <b>1개</b>!</p><p><b>7일 연속</b>으로 하면 금도장을 하나 더 줄게! 하루 쉬면 연속은 1일부터 다시지만, 모은 도장은 그대로야.</p><p>도장 <b>${BOARD}개</b>가 모이면 황금 알에서 <b>새 친구</b>가 나와. 친구를 다 모았으면 알에서 별 60개가 나와.</p></div>
+    <div class="rule-card"><h3><span class="ic">🌳</span>오늘의 탐험</h3><p>신발 끈 묶기 → 꽃길 산책 → 개울 건너기 → 언덕 오르기 → 기억 열매 따기</p><p>틀리면 다시 기회가 있고, 두 번 틀리면 힌트, 세 번 틀리면 같이 풀어 봐.</p></div>
+    <div class="rule-card"><h3><span class="ic">🧭</span>내 기록</h3><div class="mine"><span>별 ${state.candy}개</span><span>도장 ${dj.board.length}/${BOARD}</span><span>연속 ${sk}일</span><span>도감 ${$('colCount').textContent}</span></div></div>`;
 }
 $('toRules').onclick=()=>{tone(SND.tap);renderRules();show('rules');};
 $('rulesBack').onclick=()=>{renderHome();show('home');};
@@ -1971,9 +1977,9 @@ function loadProblem(first){
   P.inp=P.p.fields.map(()=>'');P.af=0;P.lock=false;P.busy=false;P.t0=Date.now();P.carry=[];P.dealt=0;P.bad=[];P.hintText='';
   /* 틀린 횟수는 저장해 둬서 새로고침해도 유지 */
   P.wrong=(st.w&&st.w.i===st.idx)?st.w.n:0;
-  $('stageTitle').textContent=st.name+' · '+(P.p.game==='card'?'다르게 풀기: '+C.CARDS[P.p.card].name:C.LEVELS[P.p.lv].name);
+  $('stageTitle').textContent=st.name;
   $('progChip').textContent=(st.idx+1)+'/'+st.probs.length+' · 오늘 '+(doneCount()+1)+'/'+totalCount();
-  if(first)say(st.idx>0?'이어서 풀자! '+(st.idx+1)+'번 문제야.':st.key==='warm'?'신발 끈 꽉 묶고, 번개처럼 빠르게 출발!':st.key==='today1'?'꽃길을 따라 걸어 보자! 문제를 풀 때마다 한 걸음씩!':st.key==='today2'&&st.card?`다르게 풀기 카드야! ${st.probs.length}문제 중 ${STICKER_N(st.probs.length)}개를 한 번에 맞히면 카드 스티커를 받아.`:st.key==='today2'?'개울을 건너자! 징검돌을 하나씩 밟듯이 풀어 보자.':st.key==='today3'&&P.p.game==='horiz'?'언덕을 오르자! 이번엔 가로셈이야. 머릿속으로 자리를 맞춰 봐.':st.key==='today3'?'마지막 언덕이야! 꼭대기까지 힘내!':st.key==='review'?'드디어 기억 열매나무! 전에 배운 걸로 열매를 따 보자.':'같이 풀어 보자!');
+  if(first)say(st.idx>0?'이어서 풀자! '+(st.idx+1)+'번 문제야.':st.key==='warm'?'신발 끈 꽉 묶고, 번개처럼 빠르게 출발!':st.key==='today1'?'꽃길을 따라 걸어 보자! 문제를 풀 때마다 한 걸음씩!':st.key==='today2'?'개울을 건너자! 징검돌을 하나씩 밟듯이 풀어 보자.':st.key==='today3'&&P.p.game==='horiz'?'언덕을 오르자! 이번엔 가로셈이야. 머릿속으로 자리를 맞춰 봐.':st.key==='today3'?'마지막 언덕이야! 꼭대기까지 힘내!':st.key==='review'?'드디어 기억 열매나무! 전에 배운 걸로 열매를 따 보자.':'같이 풀어 보자!');
   else say(st.key==='warm'?'다음!':'다음 문제야!');
   if(P.p.redo&&P.wrong===0)say('어제 틀렸던 문제야! 이번엔 맞혀 보자.');
   if(P.wrong>=2)P.hintText=C.hint(P.p,C.diagnose(P.p,P.p.fields.map(()=>'0'),P.p.fields.map(()=>false)));
@@ -2156,13 +2162,13 @@ function renderPractice(){
   $('growModes').hidden=tab!=='grow';
   $('growModes').querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.g===PR.gmode));
   const left=pracCandyLeft();
-  $('pracNote').textContent=(tab==='free'?'공부하고 싶은 주제와 난이도를 골라요. 한 번에 10문제!':PR.gmode==='basic'?'20문제를 풀어요. 잘 맞히면 점점 어려워지고, 어려우면 쉬워져요.':`${PR.gmode==='t60'?'1분':'2분'} 동안 최대한 많이 풀어요. 최고 기록에 도전!`)+` · 오늘 연습에서 받을 수 있는 별사탕 ${left}개 남음`;
+  $('pracNote').textContent=(tab==='free'?'공부하고 싶은 주제와 난이도를 골라요. 한 번에 10문제!':PR.gmode==='basic'?'20문제를 풀어요. 잘 맞히면 점점 어려워지고, 어려우면 쉬워져요.':`${PR.gmode==='t60'?'1분':'2분'} 동안 최대한 많이 풀어요. 최고 기록에 도전!`)+` · 오늘 연습에서 받을 수 있는 별 ${left}개 남음`;
   let h='';
   if(tab==='grow')h+=`<div class="topic mix"><b>골고루 섞기</b><span class="tag">여러 주제를 섞어서 내요. 자주 틀린 주제가 더 많이 나와요</span><div class="tools"><button type="button" class="btn primary" data-start="mix">시작</button></div>${PR.gmode!=='basic'?`<span class="tag">${bestText('mix')}</span>`:''}</div>`;
   h+=lv.map(l=>{const L=C.LEVELS[l];
     if(tab==='free')return `<div class="topic"><b>${esc(L.name)}</b><span class="tag">${L.sem==='2학년'?'2학년 복습':L.sem.replace('-','학년 ')+'학기'}</span><div class="steps3">${[1,2,3].map(st=>`<button type="button" class="btn${st===2?' primary':''}" data-lv="${l}" data-step="${st}">${STEP_NM[st-1]}<small>${esc(C.STEPS[l][st-1])}</small></button>`).join('')}</div></div>`;
     const sk=state.skill[l]||1;
-    return `<div class="topic"><b>${esc(L.name)}</b><span class="tag">${state.skill[l]?'지금 실력 '+'★'.repeat(sk)+'☆'.repeat(3-sk):'처음 해 봐요'}${PR.gmode!=='basic'?' · '+bestText(l):''}</span><div class="tools"><button type="button" class="btn primary" data-start="${l}">시작</button></div></div>`;}).join('');
+    return `<div class="topic"><b>${esc(L.name)}</b><span class="tag">${state.skill[l]?'지금 실력: '+['쉬움','보통','어려움'][Math.max(0,Math.min(2,sk-1))]:'처음 해 봐요'}${PR.gmode!=='basic'?' · '+bestText(l):''}</span><div class="tools"><button type="button" class="btn primary" data-start="${l}">시작</button></div></div>`;}).join('');
   $('topicGrid').innerHTML=h||'<p class="note">엄마 설정에서 연습할 주제를 열어 주세요.</p>';
 }
 function bestText(l){const b=state.best['t'+PR.gmode+'_'+l];return b?'최고 '+b+'문제':'아직 기록 없음';}
@@ -2207,7 +2213,7 @@ function loadPracProblem(first){
   P.inp=P.p.fields.map(()=>'');P.af=0;P.lock=false;P.busy=false;P.t0=Date.now();P.carry=[];P.dealt=0;P.bad=[];P.hintText='';
   P.wrong=(ss.w&&ss.w.i===ss.idx)?ss.w.n:0;
   $('stageTitle').textContent=ss.name+(ss.kind==='free'?' ('+STEP_NM[ss.step-1]+')':'');
-  $('progChip').textContent=ss.kind==='time'?'맞힌 문제 '+(ss.idx-ss.skip):(ss.idx+1)+'/'+ss.target+(ss.kind==='grow'?' · 난이도 '+'★'.repeat(ss.step)+'☆'.repeat(3-ss.step):'');
+  $('progChip').textContent=ss.kind==='time'?'맞힌 문제 '+(ss.idx-ss.skip):(ss.idx+1)+'/'+ss.target+(ss.kind==='grow'?' · '+['쉬움','보통','어려움'][ss.step-1]:'');
   if(first)say(ss.kind==='time'?'준비, 시작! 빠르고 정확하게!':ss.kind==='grow'?'실력에 맞춰 문제가 바뀌어! 같이 해 보자.':'좋아, 연습해 보자!');
   else if(ss.kind!=='time')say('다음 문제야!');
   renderProblem();
@@ -2216,7 +2222,7 @@ function loadPracProblem(first){
 /* 실력 쑥쑥: 3번 연속 한 번에 맞히면 어렵게, 2번 연속 틀리면 쉽게 */
 function pracAdapt(correct){
   const ss=PR.sess;if(ss.kind!=='grow'||ss.idx>=ss.target)return '';
-  if(correct&&P.wrong===0){ss.okRun++;ss.ngRun=0;if(ss.okRun>=3&&ss.step<3){ss.step++;ss.okRun=0;return '잘하는데? 한 단계 어려워졌어! '+'★'.repeat(ss.step);}}
+  if(correct&&P.wrong===0){ss.okRun++;ss.ngRun=0;if(ss.okRun>=3&&ss.step<3){ss.step++;ss.okRun=0;return '잘하는데? 조금 어려워졌어! ('+['쉬움','보통','어려움'][ss.step-1]+')';}}
   else if(!correct){ss.ngRun++;ss.okRun=0;if(ss.ngRun>=2&&ss.step>1){ss.step--;ss.ngRun=0;return '조금 쉬운 문제로 바꿔 줄게';}}
   else{ss.okRun=0;}
   return '';
@@ -2231,10 +2237,10 @@ function finishPrac(){
   const ss=PR.sess;if(ss.finished)return;ss.finished=true;stopTicker();closeMemoPad();
   const score=ss.kind==='time'?ss.idx-ss.skip:ss.first;
   const total=ss.kind==='time'?ss.idx:ss.target;
-  let note='',stars=C.starsFor(ss.first,Math.max(1,ss.kind==='time'?ss.idx:ss.target));
+  let note='';
   if(ss.kind==='time'){const k='t'+(ss.dur===60?'t60':'t120')+'_'+ss.lv,b=state.best[k]||0;
     if(score>b){state.best[k]=score;note=b?' · 새 최고 기록!':' · 첫 기록이에요!';}else note=' · 최고 '+b+'문제';
-    stars=score===0?1:score>=b?3:score>=b*0.7?2:1;}
+    }
   if(ss.kind!=='free'&&ss.lv!=='mix')state.skill[ss.lv]=ss.step;
   if(ss.kind!=='free'&&ss.lv==='mix')pracLevels().forEach(l=>{if(!state.skill[l])state.skill[l]=ss.step;});
   state.pracHist.push({date:todayStr(),kind:ss.kind,lv:ss.lv,step:ss.startStep,end:ss.step,total,first:ss.first,score,sec:Math.round(ss.sec),dur:ss.dur});
@@ -2242,9 +2248,9 @@ function finishPrac(){
   tone(SND.clear);show('play');P.lock=true;
   $('clearMon').innerHTML=avatarHTML(partner());$('clearScene').innerHTML=sceneHTML('prac');
   $('clearTitle').textContent=ss.kind==='time'?'시간 끝!':'연습 끝!';
-  $('clearStars').innerHTML=[0,1,2].map(k=>starSVG(k<stars)).join('');
+  $('clearStars').innerHTML=ss.kind==='time'?'':diaSVG(ss.first>=ss.target,'big');
   $('clearText').textContent=ss.kind==='time'?`${ss.dur===60?'1분':'2분'} 동안 ${score}문제를 맞혔어요${note}`:
-    `한 번에 맞힌 문제 ${ss.first}/${ss.target}개`+(ss.kind==='grow'?` · 난이도 ${'★'.repeat(ss.step)}${'☆'.repeat(3-ss.step)}`:'');
+    `한 번에 맞힌 문제 ${ss.first}/${ss.target}개`+(ss.kind==='grow'?` · 난이도 ${['쉬움','보통','어려움'][ss.step-1]}`:'');
   $('clearOk').textContent='한 번 더';$('clearOk').dataset.next='again';
   $('clearMap').textContent='연습 메뉴로';$('clearMap').hidden=false;
   $('clearBox').hidden=false;$('clearOk').focus();
@@ -2294,7 +2300,7 @@ function submit(){
     if(P.wrong===0){st.first++;gotCandy=giveCandy();}
     st.idx++;st.w=null;
     tone(SND.ok);w.classList.add('hop');
-    let msg=rndOf(PRAISE)+(gotCandy?' 별사탕 +1':'');
+    let msg=rndOf(PRAISE)+(gotCandy?' 별 +1':'');
     if(prac){const up=pracAdapt(true);if(up)msg+='<br>'+up;say(msg);pracAdvance(st.kind==='time'?350:800);return;}
     if(p.op==='÷r')msg+=`<br>검산: ${p.b} × ${g.exp[0]} + ${g.exp[p.game==='qrsteps'?2:1]} = ${p.a}`;
     let delay=st.key==='warm'?450:900;
@@ -2364,11 +2370,11 @@ function showStageClear(i){
   stopTicker();tone(SND.clear);show('play');
   $('clearMon').innerHTML=avatarHTML(partner());$('clearScene').innerHTML=sceneHTML(st.key);
   $('clearTitle').textContent=st.name+' 완료!';
-  $('clearStars').innerHTML=[0,1,2].map(k=>starSVG(k<st.stars)).join('');
+  const pf=perfect(st);
+  $('clearStars').innerHTML=diaSVG(pf,'big');
   let extra='';
-  if(st.card&&st.card!=='mix'){const nm=C.CARDS[st.card].name;extra=st.sticker?(st.newSticker?` · "${nm}" 카드 스티커를 받았어요!`:` · "${nm}" 카드 스티커는 이미 있어요`):` · ${STICKER_N(n)}개 이상 맞히면 스티커! 내일 다시 도전해요`;}
-  if(all){const g=t.gotStamps||1;extra+=` · 오늘의 미션 완료! 도장 쾅!`+(g>1?' 7일 연속이라 금도장도 하나 더!':'')+(t.gradLv?` · ${C.LEVELS[t.gradLv].name} 졸업!`:'');}
-  $('clearText').textContent=`한 번에 맞힌 문제 ${st.first}/${n}개${st.clearNote||''}`+extra;
+  if(all){const g=t.gotStamps||1;extra+=` · 오늘의 미션 완료! 도장 쾅!`+(g>1?' 7일 연속이라 금도장도 하나 더!':'');}
+  $('clearText').textContent=(pf?`${n}문제 모두 한 번에! 반짝 다이아몬드!`:`한 번에 ${st.first}개! 다 맞히면 다이아몬드야`)+` · 별 +${st.first}${st.clearNote||''}`+extra;
   $('clearOk').textContent=all?'도장판 보기':'다음: '+t.stages[next].name;$('clearMap').textContent='지도로 가기';
   $('clearOk').dataset.next=all?'stamp':String(next);
   $('clearMap').hidden=false;
@@ -2386,7 +2392,7 @@ function completeMission(){
   const t=T(),s=state.set;if(t.done)return;t.done=true;
   const byKey=k=>(t.stages.find(x=>x.key===k)||{stars:0}).stars;
   const keys=t.v21?C.BASIC_KEYS:C.TODAY_KEYS,cs=t.stages.find(x=>x.key==='today2');
-  const rec={date:t.date,lv:t.lv||s.cur,step:t.step||s.step,total:totalCount(),first:t.stages.reduce((a,x)=>a+x.first,0),sec:Math.round(t.sec),stars:t.stages.map(x=>x.stars),firsts:t.stages.map(x=>x.first+'/'+x.probs.length),avg:keys.reduce((a,k)=>a+byKey(k),0)/keys.length,mist:Object.assign({},t.mist),
+  const rec={date:t.date,lv:t.lv||s.cur,step:t.step||s.step,total:totalCount(),first:t.stages.reduce((a,x)=>a+x.first,0),sec:Math.round(t.sec),stars:t.stages.map(x=>x.stars),firsts:t.stages.map(x=>x.first+'/'+x.probs.length),b8:(()=>{const v=keys.map(k=>t.stages.find(x=>x.key===k)).filter(Boolean).map(x=>x.first/x.probs.length*8);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length*100)/100:0;})(),avg:keys.reduce((a,k)=>a+byKey(k),0)/keys.length,mist:Object.assign({},t.mist),
     errs:(t.errs||[]).filter(e=>e.src==='mission').slice(-30),names:t.stages.map(x=>x.name),card:cs&&cs.card?{id:cs.card,first:cs.first,n:cs.probs.length,ok:!!cs.sticker}:null,daji:!!t.daji};
   state.hist=state.hist.filter(h=>h.date!==t.date);state.hist.push(rec);state.hist=state.hist.slice(-60);
   const sk=state.streak;
@@ -2398,23 +2404,23 @@ function completeMission(){
 }
 const BOARD=30;
 function addStamp(d,g){const dj=state.dojang;dj.board.push({d,g});dj.n++;while(dj.board.length>=BOARD){dj.board=dj.board.slice(BOARD);dj.eggs++;}}
-/* 단계 올리기: 같은 단계 3일 연속 + 기본 계산 별 평균 2.5 (엄마 승인 기본)
+/* 기본 계산(꽃길 산책·언덕 오르기) 한 번에 맞힌 수를 8문제 기준으로: 하루 평균 (v2.2) */
+function basic8(r){if(typeof r.b8==='number')return r.b8;const f=(r.firsts||[]);const v=[1,3].map(i=>f[i]).filter(Boolean).map(x=>{const [a,b]=x.split('/').map(Number);return b?a/b*8:0;});return v.length?v.reduce((a,b)=>a+b,0)/v.length:(r.avg||0)>=2.5?7:0;}
+/* 단계 올리기: 같은 단계 3일 연속 + 기본 계산 한 번에 맞힌 수 평균 8개 중 7개 이상 (엄마 승인 기본)
    3단계에서는 그 레벨 카드 스티커를 모두 모아야 레벨 졸업 → 다음 레벨 (학기 마지막이면 다지기 모드) */
 function basicReady(){
   const h=state.hist,s=state.set;if(h.length<3)return false;
   const l3=h.slice(-3);
   const same=l3.every(r=>r.lv===s.cur&&r.step===s.step);
   const consec=dayDiff(l3[0].date,l3[1].date)===1&&dayDiff(l3[1].date,l3[2].date)===1;
-  return same&&consec&&l3.reduce((a,r)=>a+r.avg,0)/3>=2.5;
+  return same&&consec&&l3.reduce((a,r)=>a+basic8(r),0)/3>=7;
 }
 function checkLevelUp(){
   const s=state.set;if(s.auto==='off'||state.pendingUp||!basicReady())return;
   if(s.step>=3){
     if(!cardsDone(s.cur))return;
     if(!state.grad.includes(s.cur)){state.grad.push(s.cur);if(state.today)state.today.gradLv=s.cur;
-      /* 레벨 졸업 축하 (친구·별사탕 없이 메달만, 메달은 처음 한 번) */
-      let medal=false;if(!state.items.includes('medal')){state.items.push('medal');medal=true;}
-      state.cele={lv:s.cur,medal,last:!C.nextLevel(s)};}
+      /* v2.2: 레벨 졸업은 엄마 리포트에만 (아이 화면에는 축하·메달 없음) */}
   }
   if(C.nextLevel(s)){if(s.auto==='auto')advance(true);else state.pendingUp=true;}
 }
@@ -2423,7 +2429,7 @@ function advance(silent){
   if(!n){toast('이번 학기 마지막 레벨이에요. 다지기 모드로 공부해요');state.pendingUp=false;save();return;}
   if(n.cur!==s.cur&&!s.review.includes(s.cur))s.review.push(s.cur);
   s.cur=n.cur;s.step=n.step;s.review=s.review.filter(l=>l!==s.cur);state.pendingUp=false;
-  let gift='';if(!state.items.includes('medal')){state.items.push('medal');gift=' 메달 선물도 받았어요!';}
+  const gift='';
   save();if(!silent)toast(lvName(s.cur)+' '+s.step+'단계로 올렸어요.'+gift);
 }
 document.addEventListener('keydown',e=>{
@@ -2480,9 +2486,9 @@ function tapEgg(){
   }else{
     $('eggBox').innerHTML=`<div class="newmon">${starSVG(true)}</div>`;
     $('rewardTitle').textContent='친구를 모두 모았어요!';
-    $('rewardText').textContent='대신 별사탕을 듬뿍 받아요';
+    $('rewardText').textContent='대신 별을 듬뿍 받아요';
   }
-  $('rewardGain').hidden=!gain;$('rewardGain').innerHTML=`별사탕 +${gain}`;
+  $('rewardGain').hidden=!gain;$('rewardGain').innerHTML=`별 +${gain}`;
   $('rewardDone').hidden=false;$('rewardDeco').hidden=false;
 }
 $('eggBox').addEventListener('click',e=>{if(e.target.closest('#egg'))tapEgg();});
@@ -2522,7 +2528,7 @@ function renderDeco(){
   $('slotTabs').innerHTML=SLOTS.map(([id,nm])=>`<button type="button" class="tab${D.slot===id?' on':''}" data-slot="${id}">${nm}</button>`).join('');
   $('itemGrid').innerHTML=ITEMS.filter(i=>i.slot===D.slot).map(it=>{
     const own=state.items.includes(it.id),worn=w[it.slot]===it.id;
-    let st;if(worn)st='착용 중 · 누르면 벗기';else if(own)st='누르면 입기';else if(it.special)st='★ '+it.special;else if(D.armed===it.id)st='한 번 더 누르면 사요';else st='별사탕 '+it.price+'개';
+    let st;if(worn)st='착용 중 · 누르면 벗기';else if(own)st='누르면 입기';else if(it.special)st='★ '+it.special;else if(D.armed===it.id)st='한 번 더 누르면 사요';else st='별 '+it.price+'개';
     const cls=worn?' worn':D.armed===it.id?' armed':(!own&&(it.special||state.candy<it.price))?' cant':'';
     return `<button type="button" class="item${cls}" data-item="${it.id}"><span class="ip">${it.svg}</span><b>${it.name}</b><small>${st}</small></button>`;}).join('');
   const canAdj=D.slot!=='bg'&&!!w[D.slot];
@@ -2537,7 +2543,7 @@ $('itemGrid').addEventListener('click',e=>{
   const w=state.wear[p.id]||(state.wear[p.id]={});
   if(state.items.includes(it.id)){if(w[it.slot]===it.id)delete w[it.slot];else w[it.slot]=it.id;D.armed=null;save();tone(SND.tap);renderDeco();return;}
   if(it.special){toast('특별 선물로만 받을 수 있어요 ('+it.special+')');return;}
-  if(state.candy<it.price){toast('별사탕이 '+(it.price-state.candy)+'개 더 필요해요');return;}
+  if(state.candy<it.price){toast('별이 '+(it.price-state.candy)+'개 더 필요해요');return;}
   if(D.armed!==it.id){D.armed=it.id;tone(SND.tap);renderDeco();return;}
   state.candy-=it.price;state.items.push(it.id);w[it.slot]=it.id;D.armed=null;save();tone(SND.buy);toast(josa(it.name,'을를')+' 샀어요!');renderDeco();
 });
@@ -2635,7 +2641,7 @@ function renderParent(){
   const s=state.set;
   // 레벨 올리기
   $('upPanel').hidden=!state.pendingUp;
-  if(state.pendingUp){const n=C.nextLevel(s);$('upText').textContent=`${lvName(s.cur)} ${s.step}단계를 3일 연속 잘했어요 (별 평균 2.5 이상)${s.step>=3?' · 카드 스티커도 모두 모아서 레벨 졸업!':''}. 다음: ${n?lvName(n.cur)+' '+n.step+'단계':'없음'}`;}
+  if(state.pendingUp){const n=C.nextLevel(s);$('upText').textContent=`${lvName(s.cur)} ${s.step}단계를 3일 연속 잘했어요 (기본 계산 평균 8개 중 7개 이상)${s.step>=3?' · 다르게 풀기 카드도 모두 통과해서 레벨 졸업!':''}. 다음: ${n?lvName(n.cur)+' '+n.step+'단계':'없음'}`;}
   // 학기
   const SN={'2학년':'2학년 복습','3-1':'3학년 1학기','3-2':'3학년 2학기','4-1':'4학년 1학기','4-2':'4학년 2학기','5-1':'5학년 1학기','5-2':'5학년 2학기','6-1':'6학년 1학기','6-2':'6학년 2학기'};
   $('semSel').innerHTML=C.SEMS.map(x=>`<option value="${x}" ${readySem(x)?'':'disabled'} ${x===s.sem?'selected':''}>${SN[x]}${readySem(x)?'':' (준비 중)'}</option>`).join('');
@@ -2710,8 +2716,8 @@ $('t3Radios').onchange=e=>{state.set.t3h=e.target.value==='1';save();};
 $('redoRadios').onchange=e=>{state.set.redo=e.target.value==='1';save();};
 $('upYes').onclick=()=>{advance(false);renderParent();};
 $('upNo').onclick=()=>{state.pendingUp=false;save();renderParent();};
-/* 별사탕 선물은 메시지로 전달 → 다른 태블릿에서 푸는 중이어도 사라지지 않고, 아이가 읽을 때 받음 */
-document.querySelectorAll('[data-gift]').forEach(b=>b.onclick=()=>{state.msgs=state.msgs||[];state.msgs.push({id:'m'+Date.now()+Math.floor(Math.random()*1000),text:'엄마가 별사탕을 선물했어!',candy:+b.dataset.gift,at:Date.now(),read:false});save();tone(SND.buy);toast('별사탕 '+b.dataset.gift+'개를 보냈어요. 아이가 앱을 열면 받아요');renderParent();});
+/* 별 선물은 메시지로 전달 → 다른 태블릿에서 푸는 중이어도 사라지지 않고, 아이가 읽을 때 받음 */
+document.querySelectorAll('[data-gift]').forEach(b=>b.onclick=()=>{state.msgs=state.msgs||[];state.msgs.push({id:'m'+Date.now()+Math.floor(Math.random()*1000),text:'엄마가 별을 선물했어!',candy:+b.dataset.gift,at:Date.now(),read:false});save();tone(SND.buy);toast('별 '+b.dataset.gift+'개를 보냈어요. 아이가 앱을 열면 받아요');renderParent();});
 
 /* 캐릭터 넣기 */
 
@@ -2738,7 +2744,7 @@ const ETYPE={
   gen:['계산 실수','천천히 다시 풀어 보게 해 주세요.']
 };
 const etName=t=>/^card:/.test(t)?'다르게 풀기: '+((C.CARDS[t.slice(5)]||{}).name||'카드'):(ETYPE[t]||ETYPE.gen)[0];
-const etTip=t=>/^card:/.test(t)?'틀린 카드는 스티커를 받을 때까지 다음 날 다시 나와요. 첫 문제를 옆에서 같이 풀며, 세 번 틀리면 나오는 풀이 창을 함께 읽어 주세요.':(ETYPE[t]||ETYPE.gen)[1];
+const etTip=t=>/^card:/.test(t)?'통과하지 못한 카드는 통과할 때까지 다음 날 다시 나와요. 첫 문제를 옆에서 같이 풀며, 세 번 틀리면 나오는 풀이 창을 함께 읽어 주세요.':(ETYPE[t]||ETYPE.gen)[1];
 function dayList(n){const out=[],td=todayStr();for(let k=n-1;k>=0;k--)out.push(addDays(td,-k));return out;}
 function dayData(d){
   /* 하루 기록: 끝낸 미션은 hist, 오늘 진행 중이면 today */
@@ -2758,7 +2764,7 @@ function weekErrs(){
 function levelProgress(){
   const s=state.set,h=state.hist;let n=0;
   for(let i=h.length-1;i>=0;i--){const r=h[i];if(r.lv!==s.cur||r.step!==s.step)break;if(i<h.length-1&&dayDiff(r.date,h[i+1].date)!==1)break;n++;}
-  const last=h.slice(-Math.min(3,n));const avg=last.length?last.reduce((a,r)=>a+r.avg,0)/last.length:0;
+  const last=h.slice(-Math.min(3,n));const avg=last.length?last.reduce((a,r)=>a+basic8(r),0)/last.length:0;
   return {n:Math.min(n,3),avg};
 }
 function summaryLines(){
@@ -2780,7 +2786,7 @@ function summaryLines(){
   if(t.done&&prev){const a=td.first/Math.max(1,td.total),b=prev.first/Math.max(1,prev.total);
     if(a-b>=0.05)L.push(`지난번보다 정답률이 ${Math.round((a-b)*100)}%p 올랐어요.`);else if(b-a>=0.05)L.push(`지난번보다 정답률이 ${Math.round((b-a)*100)}%p 내려갔어요.`);}
   const cs=t.stages.find(x=>x.key==='today2');
-  if(cs&&cs.card&&cs.card!=='mix'&&cs.stars>0){const nm=C.CARDS[cs.card].name;L.push(`다르게 풀기 카드 "${nm}": ${cs.probs.length}문제 중 ${cs.first}문제를 한 번에 맞혀서 ${cs.sticker?'스티커를 받았어요.':'스티커는 내일 다시 도전해요.'}`);}
+  if(cs&&cs.card&&cs.card!=='mix'&&cs.stars>0){const nm=C.CARDS[cs.card].name;L.push(`다르게 풀기 카드 "${nm}": ${cs.probs.length}문제 중 ${cs.first}문제를 한 번에 맞혀서 ${cs.sticker?'통과했어요.':'통과하지 못해서 내일 같은 카드가 다시 나와요.'}`);}
   if(t.daji)L.push('이번 학기 레벨을 모두 졸업해서 다지기 모드로 공부했어요.');
   if(t.gradLv)L.push(`${C.LEVELS[t.gradLv].name} 레벨을 졸업했어요!`);
   if(state.streak.n>=2&&state.streak.last===todayStr())L.push(`${state.streak.n}일 연속으로 공부했어요!`);
@@ -2829,7 +2835,7 @@ function renderReport(){
     <div class="kpi"><b>${streakNow()}<small>일</small></b><span>연속 공부</span></div>
     <div class="kpi"><b>${state.dojang.board.length}<small>/${BOARD}</small></b><span>도장 (새 친구까지 ${BOARD-state.dojang.board.length})</span></div>`;
   $('repStages').innerHTML=t.stages.map(x=>{const n=x.probs.length,f=x.first,dn=x.idx>=n;
-    return `<div class="rstage${dn?'':' wait'}"><span class="rsn">${esc(x.name)}</span><span class="rss">${dn?'★'.repeat(x.stars)+'☆'.repeat(3-x.stars):x.idx?x.idx+'/'+n+' 진행 중':'아직'}</span><span class="rsf">${dn||x.idx?`한 번에 ${f}/${x.idx||n}`:''}</span></div>`;}).join('');
+    return `<div class="rstage${dn?'':' wait'}"><span class="rsn">${esc(x.name)}</span><span class="rss">${dn?(x.first>=n?'💎 ':'')+x.first+'/'+n+' 한 번에':x.idx?x.idx+'/'+n+' 진행 중':'아직'}</span><span class="rsf">${dn||x.idx?`한 번에 ${f}/${x.idx||n}`:''}</span></div>`;}).join('');
   // 짝꿍 한 줄 평
   $('repMon').innerHTML=avatarHTML(p);
   $('repLines').innerHTML=summaryLines().map(l=>`<li>${esc(l)}</li>`).join('');
@@ -2844,12 +2850,12 @@ function renderReport(){
   const lp=levelProgress(),nx=C.nextLevel(s);
   const lc=lvCards(s.cur),lg=lc.filter(hasSticker).length;
   $('repLevel').textContent=isDaji()?`이번 학기 레벨을 모두 졸업했어요. 지금은 다지기 모드예요 (배운 레벨 섞어서 연습). 새 학기가 되면 설정에서 학기를 바꿔 주세요.`:
-    `지금 공부: ${L.name} (${C.STEPS[s.cur][s.step-1]}) · 레벨 ${s.cur}-${s.step}. 다음 단계까지 연속 ${lp.n}/3일`+(lp.n?` (기본 계산 별 평균 ${lp.avg.toFixed(1)}, 2.5 이상 필요)`:'')+(lc.length?` · 카드 스티커 ${lg}/${lc.length}`+(s.step>=3&&lg<lc.length?' (레벨 졸업에 필요)':''):'')+(nx?'':' · 이번 학기 마지막 레벨이에요.');
+    `지금 공부: ${L.name} (${C.STEPS[s.cur][s.step-1]}) · 레벨 ${s.cur}-${s.step}. 다음 단계까지 연속 ${lp.n}/3일`+(lp.n?` (기본 계산 한 번에 평균 ${lp.avg.toFixed(1)}/8개, 7개 이상 필요)`:'')+(lc.length?` · 다르게 풀기 카드 통과 ${lg}/${lc.length}`+(s.step>=3&&lg<lc.length?' (레벨 졸업에 필요)':''):'')+(nx?'':' · 이번 학기 마지막 레벨이에요.');
   // 다르게 풀기 카드
   const hc={};state.hist.forEach(h=>{if(h.card&&h.card.id&&h.card.id!=='mix'){(hc[h.card.id]=hc[h.card.id]||[]).push(h.card);}});
   if(t.done===false){const cs=t.stages.find(x=>x.key==='today2');if(cs&&cs.card&&cs.card!=='mix'&&cs.stars>0)(hc[cs.card]=hc[cs.card]||[]).push({first:cs.first,n:cs.probs.length});}
-  $('repCards').innerHTML=lc.length?`<table><tr><th>카드</th><th>열리는 단계</th><th>스티커</th><th>도전</th><th>최근 결과</th></tr>${lc.map(id=>{const d=C.CARDS[id],tr=hc[id]||[],last=tr[tr.length-1];
-      return `<tr class="${hasSticker(id)?'':'wait'}"><td>${esc(d.name)}</td><td>${d.step}단계</td><td>${hasSticker(id)?'받음 ('+state.cards[id].d.slice(5).replace('-','/')+')':s.step>=d.step?'도전 중':'아직 안 열림'}</td><td>${tr.length}번</td><td>${last?last.first+'/'+last.n:'-'}</td></tr>`;}).join('')}</table>`:'<p class="note">지금 레벨에는 다르게 풀기 카드가 없어요.</p>';
+  $('repCards').innerHTML=lc.length?`<table><tr><th>카드</th><th>열리는 단계</th><th>통과</th><th>도전</th><th>최근 결과</th></tr>${lc.map(id=>{const d=C.CARDS[id],tr=hc[id]||[],last=tr[tr.length-1];
+      return `<tr class="${hasSticker(id)?'':'wait'}"><td>${esc(d.name)}</td><td>${d.step}단계</td><td>${hasSticker(id)?'통과 ('+state.cards[id].d.slice(5).replace('-','/')+')':s.step>=d.step?'도전 중':'아직 안 열림'}</td><td>${tr.length}번</td><td>${last?last.first+'/'+last.n:'-'}</td></tr>`;}).join('')}</table>`:'<p class="note">지금 레벨에는 다르게 풀기 카드가 없어요.</p>';
   // 연습
   const PH=state.pracHist.slice(-5).reverse(),KN={free:'자유 연습',grow:'실력 쑥쑥',time:'시간 도전'};
   const bests=Object.keys(state.best).filter(k=>/^tt(60|120)_/.test(k)).map(k=>{const m=k.match(/^tt(60|120)_(.+)$/);return `${m[1]==='60'?'1분':'2분'} · ${m[2]==='mix'?'골고루 섞기':C.LEVELS[+m[2]].name} ${state.best[k]}문제`;});
@@ -2859,7 +2865,7 @@ function renderReport(){
 }
 function renderMsgList(){
   const M=(state.msgs||[]).slice(-5).reverse();
-  $('msgList').innerHTML=M.length?M.map(m=>`<li>${new Date(m.at).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'})} "${esc(m.text)}"${m.candy?` · 별사탕 ${m.candy}개`:''} — <span class="${m.read?'good':'tag'}">${m.read?'아이가 읽었어요':'아직 안 읽음'}</span></li>`).join(''):'<li class="tag">보낸 메시지가 없어요.</li>';
+  $('msgList').innerHTML=M.length?M.map(m=>`<li>${new Date(m.at).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'})} "${esc(m.text)}"${m.candy?` · 별 ${m.candy}개`:''} — <span class="${m.read?'good':'tag'}">${m.read?'아이가 읽었어요':'아직 안 읽음'}</span></li>`).join(''):'<li class="tag">보낸 메시지가 없어요.</li>';
 }
 $('msgSend').onclick=()=>{
   const text=$('msgText').value.trim(),candy=+$('msgCandy').value;
@@ -2878,7 +2884,7 @@ function showMomMsg(){
   if(!$('home').hidden&&!overlayOpen()){
     const m=(state.msgs||[]).find(x=>!x.read);if(!m)return false;
     $('momMon').innerHTML=avatarHTML(partner());$('momName').textContent=josa(partner().name,'이가');
-    $('momText').textContent=m.text;$('momGift').hidden=!m.candy;$('momGift').textContent='별사탕 +'+m.candy;
+    $('momText').textContent=m.text;$('momGift').hidden=!m.candy;$('momGift').textContent='별 +'+m.candy;
     $('momBox').dataset.id=m.id;$('momBox').hidden=false;tone(SND.clear);$('momOk').focus();return true;}
   return false;
 }
@@ -2941,12 +2947,12 @@ $('tSkip').onclick=()=>{ensureToday();const i=curStage();if(i<0){toast('오늘 �
   const st=T().stages[i];st.first=st.probs.length;markStageDone(i);toast(st.name+' 스테이지를 끝냈어요');renderParent();};
 $('tEgg').onclick=()=>{state.dojang.eggs++;save();startReward();};
 $('tStamp').onclick=()=>{const td=todayStr();for(let i=0;i<5;i++)addStamp(td,false);save();toast('도장 +5 ('+state.dojang.board.length+'/'+BOARD+(state.dojang.eggs?', 황금 알 '+state.dojang.eggs:'')+')');renderParent();};
-$('tCards').onclick=()=>{lvCards(state.set.cur).forEach(id=>{if(!hasSticker(id))state.cards[id]={d:todayStr()};});save();toast('카드 스티커를 모두 넣었어요');renderParent();};
-$('tCandy').onclick=()=>{state.candy+=100;save();toast('별사탕 +100');renderParent();};
+$('tCards').onclick=()=>{lvCards(state.set.cur).forEach(id=>{if(!hasSticker(id))state.cards[id]={d:todayStr()};});save();toast('카드를 모두 통과로 바꿨어요');renderParent();};
+$('tCandy').onclick=()=>{state.candy+=100;save();toast('별 +100');renderParent();};
 $('tUp').onclick=()=>{const s=state.set,td=todayStr();state.hist=state.hist.filter(h=>dayDiff(h.date,td)>3);
   for(let k=3;k>=1;k--)state.hist.push({date:addDays(td,-k),lv:s.cur,step:s.step,total:40,first:38,sec:1500,stars:[3,3,3,3,3],firsts:['8/8','8/8','8/8','8/8','8/8'],avg:3,mist:{}});
   state.hist.sort((a,b)=>a.date<b.date?-1:1);state.pendingUp=false;checkLevelUp();save();
-  toast(s.auto==='off'?'자동 올리기가 꺼져 있어요':s.step>=3&&!cardsDone(s.cur)?'3단계는 카드 스티커를 다 모아야 올라가요':state.pendingUp?'레벨 올리기 알림이 생겼어요':s.auto==='auto'?'자동으로 올렸어요':isDaji()?'학기 마지막 레벨 졸업: 다지기 모드':'올릴 다음 단계가 없어요');renderParent();};
+  toast(s.auto==='off'?'자동 올리기가 꺼져 있어요':s.step>=3&&!cardsDone(s.cur)?'3단계는 다르게 풀기 카드를 모두 통과해야 올라가요':state.pendingUp?'레벨 올리기 알림이 생겼어요':s.auto==='auto'?'자동으로 올렸어요':isDaji()?'학기 마지막 레벨 졸업: 다지기 모드':'올릴 다음 단계가 없어요');renderParent();};
 $('tClear').onclick=e=>armBtn(e.currentTarget,()=>{state.col=[];state.partner=null;save();toast('도감을 비웠어요');renderParent();});
 $('tAll').onclick=e=>armBtn(e.currentTarget,()=>{state=defaults();state.dojang.init=true;state.mig2=true;save();newToday();toast('모든 기록을 지웠어요');renderParent();});
 
