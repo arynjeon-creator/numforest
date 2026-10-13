@@ -134,6 +134,21 @@ button.chip:active{transform:translateY(2px)}
 .crow.tot{border-top:4px solid var(--ink);padding-top:10px}
 .crow .txt{font-family:var(--font-body);font-size:.6em;color:var(--ink-soft)}
 .chead{font-size:1.15em;background:#FFF4D6;border-radius:14px;padding:.1em .6em}
+.cbox.al{display:grid;grid-template-columns:auto auto auto auto;column-gap:.3em;row-gap:12px;align-items:center;justify-content:center}
+.cbox.al>.chead{grid-column:1/-1;justify-self:center}
+.cbox.al>.ca{color:var(--grass-deep);justify-self:start}
+.cbox.al{max-width:100%}
+.cbox.al>.cl,.cbox.al>.cr,.cbox.al>.cfull{display:flex;align-items:center;gap:.3em;flex-wrap:nowrap;white-space:nowrap}
+.cbox.al.wrap>.cl,.cbox.al.wrap>.cr,.cbox.al.wrap>.cfull{flex-wrap:wrap;row-gap:6px}
+.cbox.al>.cl{justify-self:end;justify-content:flex-end}
+.cbox.al>.cfull{justify-content:center}
+.cbox.al>.cr{justify-self:start}
+.cbox.al>.cfull{grid-column:1/-1;justify-self:center}
+.cbox.al>.ce{text-align:center}
+.cbox.al>.given{color:var(--ink-soft)}
+.cbox.al>.crule{grid-column:1/-1;height:4px;border-radius:2px;background:var(--ink);margin-top:-2px}
+.cbox .fbox.fw{width:calc(var(--fw) * 1ch + 1em);min-width:0;padding-inline:.25em;flex-shrink:0}
+.cbox .fbox.fw.rt{justify-content:flex-end;padding-inline:.4em}
 .cgrid{display:grid;font-family:var(--font-display);font-size:clamp(30px,5.2vw,50px);font-variant-numeric:tabular-nums;line-height:1;align-items:center}
 .cgrid>.c{height:1.25em;display:flex;align-items:center;justify-content:center}
 .cgrid>.op{color:var(--coral)}
@@ -2091,6 +2106,16 @@ function renderProblem(){
       h=`<div class="pwrap"><p class="story">${p.a} × ${josa(p.b,'을를')} 쪼개서 곱해 보자!</p><div class="split">${p.fields.map((f,i)=>`<div class="srow${f.total?' tot':''}"><span class="sl">${esc(f.label)}</span><span>=</span>${fbox(i)}</div>`).join('')}</div></div>`;break;
   }
   $('problem').innerHTML=h;
+  fitAligned();
+}
+/* 줄 맞춤 카드가 화면보다 넓으면 글자를 조금씩 줄여서 한 줄에 맞춤 (그래도 넘치면 마지막 수단으로 줄바꿈) */
+function fitAligned(){
+  const box=$('problem').querySelector('.cbox.al');if(!box)return;
+  box.classList.remove('wrap');box.style.fontSize='';
+  const avail=$('problem').clientWidth,over=()=>box.getBoundingClientRect().width>avail+1||box.scrollWidth>box.clientWidth+1;
+  let fs=parseFloat(getComputedStyle(box).fontSize);
+  while(over()&&fs>16){fs-=1;box.style.fontSize=fs+'px';}
+  if(over())box.classList.add('wrap');
 }
 /* ---------- 다르게 풀기 카드 그리기 ---------- */
 const OPS=['+','−','×','÷','=','…'];
@@ -2105,7 +2130,17 @@ function cardHTML(p){
   const b=C.cardBuild(p),q=p.q,lead=b.lead?`<p class="story">${esc(b.lead)}</p>`:'';
   const cw='var(--cw,clamp(36px,6vw,58px))';
   switch(p.tpl){
-    case 'chain':case 'tree':return `<div class="pwrap">${lead}<div class="cbox">${b.head?`<div class="chead">${esc(b.head)}</div>`:''}${b.rows.map(r=>`<div class="crow ${r.cls||''}">${tokHTML(r.t)}</div>`).join('')}</div></div>`;
+    case 'chain':case 'tree':{
+      if(b.rows.length<2)return `<div class="pwrap">${lead}<div class="cbox">${b.head?`<div class="chead">${esc(b.head)}</div>`:''}${b.rows.map(r=>`<div class="crow ${r.cls||''}">${tokHTML(r.t)}</div>`).join('')}</div></div>`;
+      /* 줄이 여러 개: 모든 줄의 = 를 한 세로줄에 맞춤 (= 앞은 오른쪽 끝, = 뒤는 왼쪽 끝 맞춤).
+         답 칸은 모두 같은 너비, 나눠서 더하는 카드(tree)는 숫자를 오른쪽에 붙여 자리(일·십·백)를 맞춤 */
+      const fw=Math.max(2,...b.ans.map(x=>String(x).length)),rt=p.tpl==='tree';
+      const tk=t=>tokHTML(t).split('<button type="button" class="fbox').join(`<button type="button" style="--fw:${fw}" class="fbox fw${rt?' rt':''}`);
+      const h=b.rows.map(r=>{const c=r.cls||'',k=r.t.indexOf('=');
+        const pre=c.includes('tot')?'<span class="crule"></span>':'';
+        if(k<0||k===r.t.length-1)return pre+`<span class="cfull ${c}">${tk(r.t)}</span>`;
+        return pre+`<span class="ca">${c.includes('br')?'↳':''}</span><span class="cl ${c}">${tk(r.t.slice(0,k))}</span><span class="ce op">=</span><span class="cr ${c}">${tk(r.t.slice(k+1))}</span>`;}).join('');
+      return `<div class="pwrap">${lead}<div class="cbox al">${b.head?`<div class="chead">${esc(b.head)}</div>`:''}${h}</div></div>`;}
     case 'carry':{const A=b.ans,n=String(A[A.length-1]).length,cols=n+1;let h='';
       for(let c=0;c<n;c++){const place=n-1-c,k=b.cs.findIndex(o=>o.col===place);if(k>=0)BOXLEN[k]=1;h+=`<span class="c" style="grid-column:${c+2};grid-row:1">${k>=0?fbox(k).replace('class="fbox','class="fbox sm'):''}</span>`;}
       h+=`<span style="grid-row:2;grid-column:1"></span>`+digRow(q.a,n,2,'').replace(/style="grid-column/g,'style="grid-row:2;grid-column');
@@ -2187,7 +2222,7 @@ document.addEventListener('pointerdown',e=>{
   if(e.target.closest('#memoPad')||e.target.closest('.carry')||e.target.closest('#keypad'))return;
   closeMemoPad();
 },true);
-window.addEventListener('resize',()=>closeMemoPad());
+window.addEventListener('resize',()=>{closeMemoPad();if(!$('play').hidden)fitAligned();});
 window.addEventListener('scroll',()=>{if(!$('memoPad').hidden)closeMemoPad();},true);
 
 /* ---------- 연습: 자유 연습 · 실력 쑥쑥 연습 ---------- */
