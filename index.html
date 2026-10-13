@@ -152,6 +152,7 @@ button.chip:active{transform:translateY(2px)}
 .cgrid .fbox.sm{font-size:.5em;min-width:1.5em;height:1.5em;margin:auto}
 .fbox.span{display:grid;padding:0;height:1.25em;margin:2px 0}
 .fbox.span>i{font-style:normal;text-align:center}
+.cgrid .fbox.dcell{min-width:0;width:auto;height:calc(1.25em - 4px);margin:2px;padding:0;border-radius:12px;justify-self:stretch;align-self:center}
 .cgrid .dv{border-top:5px solid var(--ink)}
 .cgrid .brk{font-size:1.2em;color:var(--ink)}
 .tgrid{display:grid;grid-template-columns:repeat(3,auto);gap:10px 14px;align-items:center;justify-items:center;font-family:var(--font-display);font-size:clamp(26px,4.4vw,40px);font-variant-numeric:tabular-nums}
@@ -2109,8 +2110,9 @@ function renderProblem(){
 const OPS=['+','−','×','÷','=','…'];
 function tokHTML(t){return t.map(x=>x&&typeof x==='object'?fbox(x.b):OPS.includes(x)?`<span class="op">${x}</span>`:typeof x==='string'&&/[가-힣]/.test(x)&&x.length>2?`<span class="txt">${esc(x)}</span>`:`<span>${esc(x)}</span>`).join('');}
 let BOXLEN={};
-function spanBox(i,cols,col){BOXLEN[i]=cols;const v=P.inp[i]||'',cells=v.padStart(cols,' ').slice(-cols).split('');
-  return `<button type="button" class="fbox span${i===P.af?' on':''}${P.bad[i]?' bad':''}" data-f="${i}" style="grid-column:${col} / span ${cols};grid-template-columns:repeat(${cols},1fr)" aria-label="답 칸">${cells.map(ch=>`<i>${ch===' '?'':ch}</i>`).join('')}</button>`;}
+/* 세로셈 답 칸: 자리마다 네모 칸 하나씩(꽃길 산책 세로셈과 같은 방식) → 위 숫자와 같은 자리 줄에 정확히 놓임. 숫자 채우는 방식은 그대로(오른쪽에서 밀려 나옴) */
+function spanBox(i,cols,col,row){BOXLEN[i]=cols;const v=P.inp[i]||'',cells=v.padStart(cols,' ').slice(-cols).split('');
+  return cells.map((ch,k)=>`<button type="button" class="fbox dcell${i===P.af?' on':''}${P.bad[i]?' bad':''}" data-f="${i}" style="grid-row:${row};grid-column:${col+k}" aria-label="답 칸">${ch===' '?'':ch}</button>`).join('');}
 function digRow(str,n,startCol,cls){const d=String(str).split('');let h='';const off=n-d.length;d.forEach((ch,i)=>{h+=`<span class="c ${cls||''}" style="grid-column:${startCol+off+i}">${ch}</span>`;});return h;}
 function cardHTML(p){
   BOXLEN={};
@@ -2123,24 +2125,24 @@ function cardHTML(p){
       h+=`<span style="grid-row:2;grid-column:1"></span>`+digRow(q.a,n,2,'').replace(/style="grid-column/g,'style="grid-row:2;grid-column');
       h+=`<span class="c op" style="grid-row:3;grid-column:1">×</span>`+digRow(q.b,n,2,'').replace(/style="grid-column/g,'style="grid-row:3;grid-column');
       h+=`<span class="rule" style="grid-row:4;grid-column:1 / -1"></span>`;
-      h+=`<span style="grid-row:5;grid-column:1"></span>`+spanBox(A.length-1,n,2).replace('style="','style="grid-row:5;');
+      h+=`<span style="grid-row:5;grid-column:1"></span>`+spanBox(A.length-1,n,2,5);
       return `<div class="pwrap">${lead}<div class="cgrid" style="grid-template-columns:repeat(${cols},${cw})">${h}</div><p class="note">위의 작은 칸에 올림 숫자를 써요 (채점해요)</p></div>`;}
     case 'pp':{const A=b.ans,n=String(A[2]).length,cols=n+1,L0=String(A[0]).length,L1=String(A[1]).length;let h='';
       const row=(r,str)=>digRow(str,n,2,'').replace(/style="grid-column/g,`style="grid-row:${r};grid-column`);
       h+=row(1,q.a)+`<span class="c op" style="grid-row:2;grid-column:1">×</span>`+row(2,q.b);
       h+=`<span class="rule" style="grid-row:3;grid-column:1 / -1"></span>`;
-      h+=spanBox(0,L0,cols+1-L0).replace('style="','style="grid-row:4;');
-      h+=spanBox(1,L1,cols-L1).replace('style="','style="grid-row:5;');
+      h+=spanBox(0,L0,cols+1-L0,4);
+      h+=spanBox(1,L1,cols-L1,5);
       h+=`<span class="rule" style="grid-row:6;grid-column:1 / -1"></span>`;
-      h+=spanBox(2,n,2).replace('style="','style="grid-row:7;');
+      h+=spanBox(2,n,2,7);
       return `<div class="pwrap">${lead}<div class="cgrid" style="grid-template-columns:repeat(${cols},${cw})">${h}</div></div>`;}
     case 'ldiv':{const d=String(q.a).split('');let h='';
-      h+=spanBox(0,1,4).replace('style="','style="grid-row:1;');
+      h+=spanBox(0,1,4,1);
       h+=`<span class="c" style="grid-row:2;grid-column:1">${q.b}</span><span class="c brk" style="grid-row:2;grid-column:2">)</span>`;
       d.forEach((ch,i)=>{h+=`<span class="c dv" style="grid-row:2;grid-column:${3+i}">${ch}</span>`;});
-      h+=spanBox(1,2,3).replace('style="','style="grid-row:3;');
+      h+=spanBox(1,2,3,3);
       h+=`<span class="rule" style="grid-row:4;grid-column:3 / span 2"></span>`;
-      h+=spanBox(2,2,3).replace('style="','style="grid-row:5;');
+      h+=spanBox(2,2,3,5);
       return `<div class="pwrap">${lead}<div class="cgrid" style="grid-template-columns:repeat(4,${cw})">${h}</div><p class="note">맨 위 칸 = 몫, 가운데 칸 = 빼는 수, 아래 칸 = 나머지</p></div>`;}
     case 'grid':{const m=q.m;
       return `<div class="pwrap">${lead}<div class="tgrid">

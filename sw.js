@@ -1,8 +1,8 @@
-/* 숫자숲 탐험대 서비스 워커 v55d2ae51a4
+/* 숫자숲 탐험대 서비스 워커 v3e0354e1e3
    - 앱 화면은 인터넷이 되면 새 버전을 받고, 안 되면 저장해 둔 것을 씀
    - 글꼴은 한 번 받으면 저장
    - 기록 맞추기(Supabase)는 저장하지 않고 항상 인터넷으로 */
-const CACHE='numforest-55d2ae51a4';
+const CACHE='numforest-3e0354e1e3';
 const CORE=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
