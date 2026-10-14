@@ -136,6 +136,8 @@ button.chip:active{transform:translateY(2px)}
   #home .mission,.forest{padding-block:10px}
 }
 @media (max-width:600px){.farea .lab,.farea .cnt{font-size:calc(12px * var(--fs))}}
+.updbar{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;background:#FFF4D6;border:3px solid #F3D98A;border-radius:16px;padding:8px 12px;font-family:var(--font-display);font-size:calc(15px * var(--fs))}
+.updbar .btn{padding:6px 16px}
 /* 엄마 관찰 모드 */
 .obsbar{position:sticky;top:0;z-index:9;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;background:#24384A;color:#fff;border-radius:16px;padding:8px 12px;margin-bottom:10px;font-family:var(--font-display);font-size:calc(18px * var(--fs))}
 .obsbar .btn{padding:6px 14px;font-size:calc(16px * var(--fs))}
@@ -465,6 +467,7 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
   <div class="obsbar" id="obsBar" hidden><span>👀 엄마 관찰 중 · 기록은 남지 않아요</span><button class="btn" id="obsEnd" type="button">관찰 끝내기</button></div>
   <!-- 홈 -->
   <section class="screen" id="home">
+    <div class="updbar" id="updBar" hidden><span>✨ 새 버전이 나왔어요!</span><button class="btn primary" id="updGo" type="button">새로 고침</button></div>
     <div class="topbar">
       <h1 class="logo">숫자숲 탐험대<small id="logoSub">초등 연산</small></h1>
       <button class="chip menu" id="toFree" type="button">자유 연습</button>
@@ -1686,7 +1689,8 @@ function save(){
    웹앱 버전(BUILD='web')에서만 동작. 테스트판(claude 링크)과 공개 출시판에서는 꺼짐.
    가족 코드는 이 기기에만 저장되고, 서버에는 코드의 해시(암호화된 지문)만 저장됨. */
 const BUILD='web';
-const APP_VER='2.7 · 2026-10-14';
+const APP_VER='2.8 · 2026-10-14';
+const APP_BUILD='7973283726';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
 const SYNC_DEFAULT={"url": "https://mupsdurscfkbuptmsxtr.supabase.co", "key": "sb_publishable_3Wa_MeVRfkQI0JEysg2PZA_F6PfrZQ8"};
 const SKEY='numforest-sync';
 const SYNC={
@@ -2032,6 +2036,7 @@ function renderHome(){
     <text x="${cx}" y="${cy+88}" text-anchor="middle" font-family="Jua,sans-serif" font-size="29" fill="var(--ink)">도장판</text>`)+'</g>';
   $('map').innerHTML=svg;
   renderForest();
+  $('updBar').hidden=!UPD||!!OBS;
   if(state.forest&&state.forest.pend&&!OBS)setTimeout(showForestFind,350);
   $('mapHelp').textContent=OBS?'관찰 모드: 아무 스테이지나 눌러서 들어가 보세요 (끝낸 스테이지도 다시 볼 수 있어요)':egg?'황금 알을 눌러 보세요!':t.done?'오늘 도장을 받았어요! 도장판을 눌러 보세요':'반짝이는 동그라미를 눌러 시작해요';
   /* 폰처럼 좁은 화면: 지금 할 스테이지가 보이게 지도를 옆으로 이동 */
@@ -3289,17 +3294,34 @@ $('soundBtn').onclick=()=>{soundOn=!soundOn;$('soundBtn').textContent=soundOn?'�
 window.addEventListener('focus',()=>{if(!$('home').hidden)renderHome();});
 
 if(BUILD!=='web')$('logoSub').textContent='초등 연산 · 테스트판';
+/* v2.8 새 버전 확인 (웹앱): 저장된 파일을 거치지 않고 GitHub의 version.json을 직접 확인 → 다르면 홈에 "새 버전" 띠 */
+let UPD=false,updAt=0;
+async function checkUpdate(){
+  if(BUILD!=='web'||!APP_BUILD||Date.now()-updAt<60000)return;updAt=Date.now();
+  try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=await r.json();
+    if(v&&v.build&&v.build!==APP_BUILD){UPD=true;$('updBar').hidden=!!OBS;}}catch(e){}
+}
+async function applyUpdate(){
+  $('updGo').disabled=true;$('updGo').textContent='받는 중…';
+  try{if(SYNC.on()){clearTimeout(SYNC.t);await SYNC.push();}}catch(e){}
+  try{const rs=navigator.serviceWorker?await navigator.serviceWorker.getRegistrations():[];await Promise.all(rs.map(r=>r.update().catch(()=>{})));}catch(e){}
+  try{const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}catch(e){}
+  location.replace(location.pathname+'?v='+Date.now());
+}
+$('updGo').onclick=applyUpdate;
 migrateFriends();
 renderHome();show('home');
 /* 웹앱: 열 때, 다시 볼 때, 1분마다 기록 맞추기 */
 if(SYNC.on()){SYNC.pull(false);setInterval(()=>{if(!document.hidden)SYNC.pull(false);},60000);}
+checkUpdate();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdate();});
 document.addEventListener('visibilitychange',()=>{if(!SYNC.on())return;if(document.hidden){clearTimeout(SYNC.t);SYNC.push();}else SYNC.pull(false);});
 })();
 </script>
 
 <script>
 /* 홈 화면 앱: 오프라인에서도 열리게 서비스 워커 등록 */
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(()=>{});});}
 </script>
 </body>
 </html>
