@@ -138,6 +138,8 @@ button.chip:active{transform:translateY(2px)}
 @media (max-width:600px){.farea .lab,.farea .cnt{font-size:calc(12px * var(--fs))}}
 .updbar{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;background:#FFF4D6;border:3px solid #F3D98A;border-radius:16px;padding:8px 12px;font-family:var(--font-display);font-size:calc(15px * var(--fs))}
 .updbar .btn{padding:6px 16px}
+.cgrid .fbox.dcell.nextc{box-shadow:0 0 0 4px rgba(255,200,69,.7);background:#FFF4D6}
+#progChip{font-size:calc(15px * var(--fs))}
 /* 엄마 관찰 모드 */
 .obsbar{position:sticky;top:0;z-index:9;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;background:#24384A;color:#fff;border-radius:16px;padding:8px 12px;margin-bottom:10px;font-family:var(--font-display);font-size:calc(18px * var(--fs))}
 .obsbar .btn{padding:6px 14px;font-size:calc(16px * var(--fs))}
@@ -172,7 +174,7 @@ body.obs #forest{display:none}
 .fbox{font-family:var(--font-display);font-size:1em;min-width:1.7em;height:1.3em;padding-inline:.2em;border:3px dashed var(--grass);border-radius:14px;color:var(--grass-deep);background:var(--white);display:inline-flex;align-items:center;justify-content:center;line-height:1;font-variant-numeric:tabular-nums}
 .fbox.on{border-style:solid;border-color:var(--sun);box-shadow:0 0 0 4px rgba(255,200,69,.35)}
 .fbox.bad{border-color:var(--coral);background:#FFF0ED}
-.un{font-size:.6em;color:var(--ink-soft)}
+.un{font-size:.72em;color:var(--ink-soft)}
 .stgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;width:min(420px,100%)}
 .stc{aspect-ratio:1;border-radius:50%;border:3px dashed var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:15px;color:var(--lock)}
 .stc.on{border:3px solid var(--coral);color:var(--coral);background:#FFF0ED;font-size:17px}
@@ -272,8 +274,8 @@ body.obs #forest{display:none}
 .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-content:center;background:var(--paper);border:3px solid var(--line);border-radius:28px;padding:14px}
 .key{font-size:clamp(28px,4.6vw,40px);background:var(--white);border:3px solid var(--line);border-bottom-width:7px;border-radius:20px;min-height:clamp(60px,9.5vh,88px)}
 .key:active{transform:translateY(3px);border-bottom-width:4px}
-.key.del{font-size:20px;color:var(--coral)}
-.key.ok{background:var(--grass);border-color:var(--grass-deep);color:var(--white);font-size:24px}
+.key.del{font-size:calc(17px * var(--fs));color:var(--coral)}
+.key.ok{background:var(--grass);border-color:var(--grass-deep);color:var(--white);font-size:calc(20px * var(--fs))}
 
 .overlay{position:fixed;inset:0;background:rgba(36,56,74,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
 .dialog{background:var(--paper);border-radius:32px;padding:22px;max-width:440px;width:100%;box-sizing:border-box;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center;max-height:calc(100% - 32px);overflow:auto}
@@ -727,8 +729,8 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
       <div class="row" style="align-items:flex-start">
         <label>답 입력 순서</label>
         <div class="radios" id="orderRadios">
-          <label><input type="radio" name="order" value="big" id="orderBig"> 큰 자리부터 (972 → 9, 7, 2) · 암산 연습</label>
-          <label><input type="radio" name="order" value="small" id="orderSmall"> 일의 자리부터 (972 → 2, 7, 9) · 세로셈 순서</label>
+          <label><input type="radio" name="order" value="big" id="orderBig"> 큰 자리부터 (972 → 9, 7, 2) · 모든 문제</label>
+          <label><input type="radio" name="order" value="small" id="orderSmall"> 일의 자리부터 (972 → 2, 7, 9) · 세로셈·가로셈·카드 모든 문제</label>
         </div>
       </div>
       <div class="row" style="align-items:flex-start">
@@ -1689,8 +1691,8 @@ function save(){
    웹앱 버전(BUILD='web')에서만 동작. 테스트판(claude 링크)과 공개 출시판에서는 꺼짐.
    가족 코드는 이 기기에만 저장되고, 서버에는 코드의 해시(암호화된 지문)만 저장됨. */
 const BUILD='web';
-const APP_VER='2.8 · 2026-10-14';
-const APP_BUILD='7973283726';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
+const APP_VER='2.9 · 2026-10-14';
+const APP_BUILD='377086e89b';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
 const SYNC_DEFAULT={"url": "https://mupsdurscfkbuptmsxtr.supabase.co", "key": "sb_publishable_3Wa_MeVRfkQI0JEysg2PZA_F6PfrZQ8"};
 const SKEY='numforest-sync';
 const SYNC={
@@ -2336,6 +2338,8 @@ function renderProblem(){
     case 'split':
       h=`<div class="pwrap"><p class="story">${p.a} × ${josa(p.b,'을를')} 쪼개서 곱해 보자!</p><div class="split">${p.fields.map((f,i)=>`<div class="srow${f.total?' tot':''}"><span class="sl">${esc(f.label)}</span><span>=</span>${fbox(i)}</div>`).join('')}</div></div>`;break;
   }
+  /* 일의 자리부터 입력: 세로셈 말고 다른 문제에도 안내 한 줄 */
+  if(smallFirst()&&p.game!=='vert'&&p.fields&&p.fields.some((_,i)=>!isChoice(p,i)))h=`<div class="pwrap">${h}<p class="note">일의 자리부터 눌러요</p></div>`;
   $('problem').innerHTML=h;
   fitAligned();
 }
@@ -2354,7 +2358,8 @@ function tokHTML(t){return t.map(x=>x&&typeof x==='object'?fbox(x.b):OPS.include
 let BOXLEN={};
 /* 세로셈 답 칸: 자리마다 네모 칸 하나씩(꽃길 산책 세로셈과 같은 방식) → 위 숫자와 같은 자리 줄에 정확히 놓임. 숫자 채우는 방식은 그대로(오른쪽에서 밀려 나옴) */
 function spanBox(i,cols,col,row){BOXLEN[i]=cols;const v=P.inp[i]||'',cells=v.padStart(cols,' ').slice(-cols).split('');
-  return cells.map((ch,k)=>`<button type="button" class="fbox dcell${i===P.af?' on':''}${P.bad[i]?' bad':''}" data-f="${i}" style="grid-row:${row};grid-column:${col+k}" aria-label="답 칸">${ch===' '?'':ch}</button>`).join('');}
+  const nx=i===P.af&&smallFirst()&&v.length<cols?cols-1-v.length:-1;
+  return cells.map((ch,k)=>`<button type="button" class="fbox dcell${i===P.af?' on':''}${k===nx?' nextc':''}${P.bad[i]?' bad':''}" data-f="${i}" style="grid-row:${row};grid-column:${col+k}" aria-label="답 칸">${ch===' '?'':ch}</button>`).join('');}
 function digRow(str,n,startCol,cls){const d=String(str).split('');let h='';const off=n-d.length;d.forEach((ch,i)=>{h+=`<span class="c ${cls||''}" style="grid-column:${startCol+off+i}">${ch}</span>`;});return h;}
 function cardHTML(p){
   BOXLEN={};
@@ -2578,17 +2583,19 @@ function finishPrac(){
   $('clearBox').hidden=false;$('clearOk').focus();
 }
 
+function smallFirst(){return state.set.order==='small';}
 function press(k){
   if(P.lock||P.busy||$('play').hidden||overlayOpen())return;
   if(P.memoI>=0){const i=P.memoI;
     if(k==='ok'){closeMemoPad();return;}
     P.carry[i]=k==='del'?'':k;tone(SND.tap);$('memoPad').hidden=true;P.memoI=-1;renderProblem();return;}
   if(isChoice(P.p,P.af)&&k!=='ok'){if(P.p.fields.length>1){P.af=1;}else return;}
-  const vert=P.p.game==='vert'&&state.set.order==='small';
-  if(k==='del'){P.inp[P.af]=vert?P.inp[P.af].slice(1):P.inp[P.af].slice(0,-1);tone(SND.tap);}
+  /* v2.9 답 입력 순서: "일의 자리부터"이면 모든 숫자 칸에서 새 숫자를 앞(왼쪽)에 붙임 (세로셈·가로셈·카드 모두) */
+  const small=smallFirst();
+  if(k==='del'){P.inp[P.af]=small?P.inp[P.af].slice(1):P.inp[P.af].slice(0,-1);tone(SND.tap);}
   else if(k==='ok'){submit();return;}
   else{let v=P.inp[P.af];
-    if(vert){if(v.length<maxLen()){P.inp[P.af]=k+v;P.bad[P.af]=false;tone(SND.tap);}}
+    if(small){if(v.length<maxLen()){P.inp[P.af]=k+v;P.bad[P.af]=false;tone(SND.tap);}}
     else{if(v==='0')v='';if(v.length<maxLen()){P.inp[P.af]=v+k;P.bad[P.af]=false;tone(SND.tap);}}}
   renderProblem();
 }
