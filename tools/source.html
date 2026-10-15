@@ -1677,7 +1677,7 @@ function save(){
    웹앱 버전(BUILD='web')에서만 동작. 테스트판(claude 링크)과 공개 출시판에서는 꺼짐.
    가족 코드는 이 기기에만 저장되고, 서버에는 코드의 해시(암호화된 지문)만 저장됨. */
 const BUILD='artifact';
-const APP_VER='2.9 · 2026-10-14';
+const APP_VER='2.10 · 2026-10-15';
 const APP_BUILD='';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
 const SYNC_DEFAULT={url:'',key:''};
 const SKEY='numforest-sync';
@@ -1850,7 +1850,9 @@ function tone(notes){
   if(!soundOn)return;
   try{
     actx=actx||new (window.AudioContext||window.webkitAudioContext)();
-    let t=actx.currentTime;
+    /* v2.10 안드로이드에서 앱을 뒤로 보냈다 오거나 화면이 꺼졌다 켜지면 소리 장치가 잠듦 → 소리 낼 때마다 깨우기 */
+    if(actx.state!=='running'&&actx.resume)actx.resume();
+    let t=actx.currentTime+.01;
     notes.forEach(([f,d])=>{
       const o=actx.createOscillator(),g=actx.createGain();
       o.type='triangle';o.frequency.value=f;
@@ -1859,6 +1861,10 @@ function tone(notes){
     });
   }catch(e){}
 }
+/* 화면을 누를 때마다 잠든 소리 장치 깨우기 (소리는 내지 않음) */
+function wakeAudio(){try{if(actx&&actx.state!=='running'&&actx.resume)actx.resume();}catch(e){}}
+document.addEventListener('pointerdown',wakeAudio,true);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeAudio();});
 const SND={ok:[[660,.12],[990,.2]],no:[[260,.25]],tap:[[520,.07]],clear:[[523,.15],[659,.15],[784,.15],[1047,.35]],crack:[[400,.08],[300,.1]],buy:[[784,.1],[1047,.1],[1319,.2]]};
 
 /* ---------- 그리기 ---------- */
