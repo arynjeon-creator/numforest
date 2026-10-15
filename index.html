@@ -165,7 +165,9 @@ body.obs #forest{display:none}
 .vert .rule{grid-column:1/-1;height:6px;border-radius:3px;background:var(--ink);margin-block:6px}
 .vert .ans{border:3px dashed var(--grass);border-radius:12px;margin:2px;height:calc(1.25em - 4px);color:var(--grass-deep)}
 .vert .op{color:var(--coral)}
-.vert .carry{font-family:var(--font-display);font-size:.42em;height:1.3em;margin:2px auto;width:1.6em;border:2px dashed var(--lock);border-radius:8px;color:var(--coral);background:transparent}
+.vert .carry{font-family:var(--font-display);font-size:.42em;height:1.3em;margin:2px auto;width:1.6em;border:2px dotted #D6BE6E;border-radius:6px;color:#8C7B5A;background:#FFF6CC}
+.vert .memo-lab{flex-direction:column;font-size:.3em;line-height:1.15;color:#8C7B5A;font-family:var(--font-body)}
+.cgrid .up-lab{flex-direction:column;font-size:.34em;line-height:1.15;color:var(--grass-deep);font-family:var(--font-display)}
 .horiz{font-family:var(--font-display);font-size:clamp(34px,6vw,58px);display:flex;align-items:center;gap:.25em;flex-wrap:wrap;justify-content:center;font-variant-numeric:tabular-nums}
 .horiz.small{font-size:clamp(24px,4.2vw,40px)}
 .horiz .op{color:var(--coral)}
@@ -228,7 +230,8 @@ body.obs #forest{display:none}
 .cgrid>.c{height:1.25em;display:flex;align-items:center;justify-content:center}
 .cgrid>.op{color:var(--coral)}
 .cgrid>.rule{height:6px;border-radius:3px;background:var(--ink);margin-block:6px}
-.cgrid .fbox.sm{font-size:.5em;min-width:1.5em;height:1.5em;margin:auto}
+.cgrid .fbox.sm{font-size:.5em;min-width:1.5em;height:1.5em;margin:auto;border-radius:10px;border-style:dashed;border-color:var(--grass)}
+.cgrid .fbox.sm.on{border-style:solid;border-color:var(--sun)}
 .fbox.span{display:grid;padding:0;height:1.25em;margin:2px 0}
 .fbox.span>i{font-style:normal;text-align:center}
 .cgrid .fbox.dcell{min-width:0;width:auto;height:calc(1.25em - 4px);margin:2px;padding:0;border-radius:12px;justify-self:stretch;align-self:center}
@@ -1691,8 +1694,8 @@ function save(){
    웹앱 버전(BUILD='web')에서만 동작. 테스트판(claude 링크)과 공개 출시판에서는 꺼짐.
    가족 코드는 이 기기에만 저장되고, 서버에는 코드의 해시(암호화된 지문)만 저장됨. */
 const BUILD='web';
-const APP_VER='2.10 · 2026-10-15';
-const APP_BUILD='3c7e6aca3a';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
+const APP_VER='2.11 · 2026-10-15';
+const APP_BUILD='a90325b4df';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
 const SYNC_DEFAULT={"url": "https://mupsdurscfkbuptmsxtr.supabase.co", "key": "sb_publishable_3Wa_MeVRfkQI0JEysg2PZA_F6PfrZQ8"};
 const SKEY='numforest-sync';
 const SYNC={
@@ -1879,7 +1882,7 @@ function tone(notes){
 function wakeAudio(){try{if(actx&&actx.state!=='running'&&actx.resume)actx.resume();}catch(e){}}
 document.addEventListener('pointerdown',wakeAudio,true);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeAudio();});
-const SND={ok:[[660,.12],[990,.2]],no:[[260,.25]],tap:[[520,.07]],clear:[[523,.15],[659,.15],[784,.15],[1047,.35]],crack:[[400,.08],[300,.1]],buy:[[784,.1],[1047,.1],[1319,.2]]};
+const SND={next:[[700,.06],[880,.08]],hint:[[440,.09]],ok:[[660,.12],[990,.2]],no:[[260,.25]],tap:[[520,.07]],clear:[[523,.15],[659,.15],[784,.15],[1047,.35]],crack:[[400,.08],[300,.1]],buy:[[784,.1],[1047,.1],[1319,.2]]};
 
 /* ---------- 그리기 ---------- */
 let gid=0;
@@ -2293,7 +2296,7 @@ function vertHTML(p){
   const sa=String(p.a),sb=String(p.b),n=C.vertCols(p),cols=n+1,ans=P.inp[0]||'';
   const cells=(str,cls)=>str.padStart(n,' ').slice(-n).split('').map(ch=>`<span class="cell ${cls||''}">${ch===' '?'':ch}</span>`).join('');
   const memo=state.set.memo!==false,small=state.set.order==='small';
-  const carry=memo?'<span class="cell"></span>'+Array.from({length:n},(_,i)=>`<button type="button" class="carry${P.memoI===i?' on':''}" data-c="${i}" aria-label="메모 칸">${P.carry[i]||''}</button>`).join(''):'';
+  const carry=memo?'<span class="cell memo-lab" aria-hidden="true"><span>✏️</span><span>메모</span></span>'+Array.from({length:n},(_,i)=>`<button type="button" class="carry${P.memoI===i?' on':''}" data-c="${i}" aria-label="메모 칸">${P.carry[i]||''}</button>`).join(''):'';
   /* 답 칸: 큰 자리부터(계산기처럼 오른쪽에서 밀려 나옴) 또는 일의 자리부터. 일의 자리부터일 때 다음 칸을 노랗게 표시 */
   const next=small?n-1-ans.length:-1;
   const ansCells=ans.padStart(n,' ').slice(-n).split('').map((ch,i)=>`<span class="cell ans${i===next?' nextc':''}${P.bad[0]?' badc':''}">${ch===' '?'':ch}</span>`).join('');
@@ -2302,7 +2305,7 @@ function vertHTML(p){
     <span class="cell"></span>${cells(sa)}
     <span class="cell op">${C.opSym(p.op)}</span>${cells(sb)}
     <span class="rule"></span>
-    <span class="cell"></span>${ansCells}</div><p class="note">${small?'일의 자리부터 눌러요':'큰 자리부터 눌러요'}${memo?' · 위의 작은 칸은 받아올림 메모':''}</p></div>`;
+    <span class="cell"></span>${ansCells}</div><p class="note">${small?'일의 자리부터 눌러요':'큰 자리부터 눌러요'}${memo?' · ✏️ 노란 칸은 메모예요 (채점 안 해요)':''}</p></div>`;
 }
 const STORY6=[(p)=>`사탕 ${p.a}개를 ${p.b}명이 똑같이 나누면 한 명에 몇 개일까요?`,(p)=>`구슬 ${p.a}개를 ${p.b}개씩 묶으면 몇 묶음이 될까요?`];
 const STORYT={'+':[(A,B)=>`책을 ${A} 동안 읽고, 그림을 ${B} 동안 그렸어요. 모두 얼마 동안 했을까요?`,(A,B)=>`줄넘기를 ${A}, 훌라후프를 ${B} 했어요. 모두 얼마 동안 했을까요?`],
@@ -2394,11 +2397,12 @@ function cardHTML(p){
       return `<div class="pwrap">${lead}<div class="cbox al${t6?' t6':''}">${b.head?`<div class="chead">${esc(b.head)}</div>`:''}${h}</div></div>`;}
     case 'carry':{const A=b.ans,n=String(A[A.length-1]).length,cols=n+1;let h='';
       for(let c=0;c<n;c++){const place=n-1-c,k=b.cs.findIndex(o=>o.col===place);if(k>=0)BOXLEN[k]=1;h+=`<span class="c" style="grid-column:${c+2};grid-row:1">${k>=0?fbox(k).replace('class="fbox','class="fbox sm'):''}</span>`;}
+      h+=`<span class="c up-lab" style="grid-row:1;grid-column:1" aria-hidden="true"><span>올림</span><span>✔</span></span>`;
       h+=`<span style="grid-row:2;grid-column:1"></span>`+digRow(q.a,n,2,'').replace(/style="grid-column/g,'style="grid-row:2;grid-column');
       h+=`<span class="c op" style="grid-row:3;grid-column:1">×</span>`+digRow(q.b,n,2,'').replace(/style="grid-column/g,'style="grid-row:3;grid-column');
       h+=`<span class="rule" style="grid-row:4;grid-column:1 / -1"></span>`;
       h+=`<span style="grid-row:5;grid-column:1"></span>`+spanBox(A.length-1,n,2,5);
-      return `<div class="pwrap">${lead}<div class="cgrid" style="grid-template-columns:repeat(${cols},${cw})">${h}</div><p class="note">위의 작은 칸에 올림 숫자를 써요 (채점해요)</p></div>`;}
+      return `<div class="pwrap">${lead}<div class="cgrid" style="grid-template-columns:repeat(${cols},${cw})">${h}</div><p class="note">올림 숫자도 답이에요. 초록 칸을 모두 채워요 (올림이 없으면 빈칸)</p></div>`;}
     case 'pp':{const A=b.ans,n=String(A[2]).length,cols=n+1,L0=String(A[0]).length,L1=String(A[1]).length;let h='';
       const row=(r,str)=>digRow(str,n,2,'').replace(/style="grid-column/g,`style="grid-row:${r};grid-column`);
       h+=row(1,q.a)+`<span class="c op" style="grid-row:2;grid-column:1">×</span>`+row(2,q.b);
@@ -2623,9 +2627,13 @@ function zeroOk(p){
   return z;
 }
 function submit(){
-  if(P.inp.some(x=>x!=='')){zeroOk(P.p).forEach(i=>{if(P.inp[i]==='')P.inp[i]='0';});}
-  const empty=P.inp.findIndex(x=>x==='');
-  if(empty>=0){if(P.inp.every(x=>x===''))return;P.af=empty;say('빈 칸도 채워 줘!');renderProblem();return;}
+  /* v2.11 칸이 여러 개인 문제: 확인을 누르면 다음 빈 칸으로 (소리+안내). 비워 두면 0인 칸(올림 없음·나머지 0)은 꼭 채울 칸이 다 차면 0으로 */
+  if(P.inp.every(x=>x==='')){tone(SND.hint);say('숫자를 먼저 넣어 줘!');return;}
+  const z=new Set(zeroOk(P.p)),need=P.inp.findIndex((x,i)=>x===''&&!z.has(i));
+  if(need>=0){
+    let nx=P.inp.findIndex((x,i)=>i>P.af&&x==='');if(nx<0)nx=need;
+    P.af=nx;tone(SND.next);say('좋아! 다음 칸도 채워 보자');renderProblem();return;}
+  z.forEach(i=>{if(P.inp[i]==='')P.inp[i]='0';});
   const p=P.p,t=T(),st=S(),prac=P.mode==='prac';
   const g=C.grade(p,P.inp);
   const w=$('guideWrap');w.classList.remove('hop','nod');void w.offsetWidth;
