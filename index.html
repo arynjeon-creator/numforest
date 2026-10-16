@@ -176,6 +176,14 @@ body.obs #forest{display:none}
 .fbox{font-family:var(--font-display);font-size:1em;min-width:1.7em;height:1.3em;padding-inline:.2em;border:3px dashed var(--grass);border-radius:14px;color:var(--grass-deep);background:var(--white);display:inline-flex;align-items:center;justify-content:center;line-height:1;font-variant-numeric:tabular-nums}
 .fbox.on{border-style:solid;border-color:var(--sun);box-shadow:0 0 0 4px rgba(255,200,69,.35)}
 .fbox.bad{border-color:var(--coral);background:#FFF0ED}
+/* v2.13 틀린 숫자: 지우지 않고 빨간 줄을 그어 남김 */
+.struck{position:relative;color:#C2412C !important}
+.struck::after{content:'';position:absolute;left:8%;right:8%;top:50%;border-top:3px solid #C2412C;border-radius:2px;pointer-events:none}
+.cell.struck::after,.dcell.struck::after{left:0;right:0}
+.choice.struck::after{left:12%;right:12%}
+.lastans{margin:0;background:rgba(255,255,255,.88);border-radius:999px;padding:2px 14px;font-family:var(--font-display);font-size:calc(18px * var(--fs));color:var(--ink-soft);text-align:center}
+.lastans s{color:#C2412C;text-decoration-thickness:2px}
+.lastans small{font-family:var(--font-body);font-size:calc(14px * var(--fs))}
 .un{font-size:.72em;color:var(--ink-soft)}
 .stgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;width:min(420px,100%)}
 .stc{aspect-ratio:1;border-radius:50%;border:3px dashed var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:15px;color:var(--lock)}
@@ -644,7 +652,7 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
     </div>
     <div class="panel">
       <h2>아이에게 한마디</h2>
-      <p>보낸 말은 아이가 다음에 앱을 열 때 짝꿍이 전해 줘요. 다른 태블릿에서도 기록 맞추기로 전달돼요.</p>
+      <p>보낸 말은 아이 화면의 홈(미션 지도)에서 짝꿍이 전해 줘요. 기록 맞추기로 1분쯤 뒤에 아이 태블릿에 도착하고, 문제를 푸는 중이면 홈으로 돌아올 때 떠요.</p>
       <label for="msgText" class="vis">보낼 말</label>
       <textarea class="textin" id="msgText" rows="2" maxlength="80" placeholder="예: 오늘 뺄셈 정말 잘했어! 사랑해"></textarea>
       <div class="row"><label for="msgCandy">별 선물</label>
@@ -795,13 +803,18 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
         <label><input type="radio" name="prange" value="open" id="prOpen"> 현재 레벨과 복습 범위만 고를 수 있게</label>
         <label><input type="radio" name="prange" value="all" id="prAll"> 열려 있는 모든 레벨 (Lv1~12)</label>
       </div>
-      <p>연습에서는 한 번에 맞힌 문제마다 별을 받지만, 하루 최대 20개까지예요. 도장은 오늘의 미션을 끝낼 때만 받아요.</p>
+      <div class="row">
+        <label for="pracMaxSel">연습 별 하루 최대</label>
+        <select class="sel" id="pracMaxSel"><option value="20">20개 (기본)</option><option value="50">50개</option><option value="0">제한 없음</option></select>
+      </div>
+      <label class="row" style="gap:10px;cursor:pointer"><input type="checkbox" id="pracAfterChk" style="width:24px;height:24px;accent-color:var(--grass-deep)"> 오늘의 미션을 끝낸 뒤에만 연습 별 받기</label>
+      <p>연습에서는 한 번에 맞힌 문제마다 별 1개를 받아요. 도장과 다이아몬드는 오늘의 미션에서만 받아요.</p>
       <div class="tbl"><table id="pracTable"></table></div>
     </div>
 
     <div class="panel">
       <h2>별 선물</h2>
-      <p>칭찬하고 싶을 때 별을 보낼 수 있어요. 아이가 다음에 앱을 열면 짝꿍이 전해 줘요. 지금 <span id="giftNow"></span>개.</p>
+      <p>칭찬하고 싶을 때 별을 보낼 수 있어요. 아이 화면의 홈(미션 지도)에서 짝꿍이 전해 줘요 (1분쯤 걸릴 수 있어요). 지금 <span id="giftNow"></span>개.</p>
       <div class="tools"><button class="btn" data-gift="5" type="button">+5</button><button class="btn" data-gift="10" type="button">+10</button><button class="btn" data-gift="20" type="button">+20</button></div>
     </div>
 
@@ -1671,7 +1684,7 @@ let OBS=null;
 function todayStr(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function dayDiff(a,b){return Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/86400000);}
 function addDays(s,n){const d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return todayStr(d);}
-function defaults(){return {v:2,set:{cur:9,step:1,review:[1,3,4,5,6,7,8],off:[],auto:'approve',counts:[8,8,8,8,8],limit:0,pool:'both',order:'big',memo:true,t3h:true,redo:true,pracRange:'open',sem:'3-2',semLock:true,ahead:false,forestN:20},today:null,col:[],partner:null,candy:0,items:[],wear:{},adj:{},hist:[],streak:{last:null,n:0},pendingUp:false,pin:'0000',rev:0,msgs:[],stamps:{set:0,pin:0},best:{},pracHist:[],skill:{},pracCandy:{date:'',n:0},cards:{},grad:[],dojang:{n:0,board:[],eggs:0,init:false},mig2:false,forest:null,met:{}};}
+function defaults(){return {v:2,set:{cur:9,step:1,review:[1,3,4,5,6,7,8],off:[],auto:'approve',counts:[8,8,8,8,8],limit:0,pool:'both',order:'big',memo:true,t3h:true,redo:true,pracRange:'open',sem:'3-2',semLock:true,ahead:false,forestN:20,pracMax:20,pracAfter:false},today:null,col:[],partner:null,candy:0,items:[],wear:{},adj:{},hist:[],streak:{last:null,n:0},pendingUp:false,pin:'0000',rev:0,msgs:[],stamps:{set:0,pin:0},best:{},pracHist:[],skill:{},pracCandy:{date:'',n:0},cards:{},grad:[],dojang:{n:0,board:[],eggs:0,init:false},mig2:false,forest:null,met:{}};}
 function load(){
   let s=null;try{s=JSON.parse(localStorage.getItem(KEY));}catch(e){}
   return normalize(s,true);
@@ -1739,8 +1752,8 @@ function save(){
    웹앱 버전(BUILD='web')에서만 동작. 테스트판(claude 링크)과 공개 출시판에서는 꺼짐.
    가족 코드는 이 기기에만 저장되고, 서버에는 코드의 해시(암호화된 지문)만 저장됨. */
 const BUILD='web';
-const APP_VER='2.12 · 2026-10-16';
-const APP_BUILD='311678660e';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
+const APP_VER='2.13 · 2026-10-16';
+const APP_BUILD='01985554c1';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
 const SYNC_DEFAULT={"url": "https://mupsdurscfkbuptmsxtr.supabase.co", "key": "sb_publishable_3Wa_MeVRfkQI0JEysg2PZA_F6PfrZQ8"};
 const SKEY='numforest-sync';
 const SYNC={
@@ -2232,7 +2245,7 @@ function renderRules(){
   const dia=diaSVG(true,'ric');
   ensureForest();
   $('rulesBody').innerHTML=`
-    <div class="rule-card"><h3><span class="ic">${CANDY_IC}</span>별</h3><p>문제를 <b>한 번에</b> 맞히면 별 <b>1개</b>!</p><p>별로 꾸미기 방에서 짝꿍을 꾸밀 수 있어. 연습에서는 하루에 20개까지 받아.</p></div>
+    <div class="rule-card"><h3><span class="ic">${CANDY_IC}</span>별</h3><p>문제를 <b>한 번에</b> 맞히면 별 <b>1개</b>!</p><p>별로 꾸미기 방에서 짝꿍을 꾸밀 수 있어. ${state.set.pracAfter?'연습 별은 오늘의 미션을 끝낸 뒤에 받아'+(pracMax()?'. 하루 '+pracMax()+'개까지야.':'.'):pracMax()?'연습에서는 하루에 '+pracMax()+'개까지 받아.':'연습에서도 받을 수 있어.'}</p></div>
     <div class="rule-card"><h3><span class="ic">${dia}</span>다이아몬드</h3><p>오늘의 미션 스테이지 ${n8}문제를 <b>하나도 안 틀리고</b> 모두 한 번에 맞히면 반짝 다이아몬드!</p><p>다이아몬드 하나마다 <b>숲에 반딧불이 하나</b> 켜져. 반딧불 <b>${forestN()}개</b>가 켜지면 숲이 환해지고, 어둠 속에 숨어 있던 <b>친구</b>를 찾을 수 있어!</p></div>
     <div class="rule-card"><h3><span class="ic">📮</span>도장</h3><p>오늘의 미션 5개를 다 끝내면 도장 <b>1개</b>!</p><p><b>7일 연속</b>으로 하면 금도장을 하나 더 줄게! 하루 쉬면 연속은 1일부터 다시지만, 모은 도장은 그대로야.</p><p>도장 <b>${BOARD}개</b>가 모이면 황금 알에서 <b>새 친구</b>가 나와. 친구를 다 모았으면 알에서 별 60개가 나와.</p></div>
     <div class="rule-card"><h3><span class="ic">🌳</span>오늘의 탐험</h3><p>신발 끈 묶기 → 꽃길 산책 → 개울 건너기 → 언덕 오르기 → 기억 열매 따기</p><p>틀리면 다시 기회가 있고, 두 번 틀리면 힌트, 세 번 틀리면 같이 풀어 봐.</p></div>
@@ -2322,7 +2335,7 @@ function loadProblem(first){
   closeMemoPad();
   if(P.mode==='prac')return loadPracProblem(first);
   const st=T().stages[P.si];P.p=st.probs[st.idx];
-  P.inp=P.p.fields.map(()=>'');P.af=0;P.lock=false;P.busy=false;P.t0=Date.now();P.carry=[];P.dealt=0;P.bad=[];P.hintText='';
+  P.inp=P.p.fields.map(()=>'');P.af=0;P.lock=false;P.busy=false;P.t0=Date.now();P.carry=[];P.dealt=0;P.bad=[];P.last='';P.hintText='';
   /* 틀린 횟수는 저장해 둬서 새로고침해도 유지 */
   P.wrong=(st.w&&st.w.i===st.idx)?st.w.n:0;
   $('stageTitle').textContent=st.name;
@@ -2335,7 +2348,7 @@ function loadProblem(first){
   if(P.wrong>=3)showExplain();
 }
 function fbox(i,small){const lab=P.p.fields[i].label;
-  const b=`<button type="button" class="fbox${i===P.af?' on':''}${P.bad[i]?' bad':''}" data-f="${i}" aria-label="${esc(lab||'답')} 칸">${P.inp[i]||''}</button>`;
+  const b=`<button type="button" class="fbox${i===P.af?' on':''}${P.bad[i]?' bad':''}${P.bad[i]&&P.inp[i]?' struck':''}" data-f="${i}" aria-label="${esc(lab||'답')} 칸">${P.inp[i]||''}</button>`;
   return small&&lab?`<span class="fwrap">${b}<small>${esc(lab)}</small></span>`:b;}
 function vertHTML(p){
   const sa=String(p.a),sb=String(p.b),n=C.vertCols(p),cols=n+1,ans=P.inp[0]||'';
@@ -2343,8 +2356,8 @@ function vertHTML(p){
   const memo=state.set.memo!==false,small=state.set.order==='small';
   const carry=memo?'<span class="cell memo-lab" aria-hidden="true"><span>✏️</span><span>메모</span></span>'+Array.from({length:n},(_,i)=>`<button type="button" class="carry${P.memoI===i?' on':''}" data-c="${i}" aria-label="메모 칸">${P.carry[i]||''}</button>`).join(''):'';
   /* 답 칸: 큰 자리부터(계산기처럼 오른쪽에서 밀려 나옴) 또는 일의 자리부터. 일의 자리부터일 때 다음 칸을 노랗게 표시 */
-  const next=small?n-1-ans.length:-1;
-  const ansCells=ans.padStart(n,' ').slice(-n).split('').map((ch,i)=>`<span class="cell ans${i===next?' nextc':''}${P.bad[0]?' badc':''}">${ch===' '?'':ch}</span>`).join('');
+  const next=small&&!P.bad[0]?n-1-ans.length:-1;
+  const ansCells=ans.padStart(n,' ').slice(-n).split('').map((ch,i)=>`<span class="cell ans${i===next?' nextc':''}${P.bad[0]?' badc':''}${P.bad[0]&&ch!==' '?' struck':''}">${ch===' '?'':ch}</span>`).join('');
   return `<div class="pwrap"><div class="vert" style="grid-template-columns:repeat(${cols},var(--cw,clamp(40px,6.6vw,64px)))" aria-label="${p.a} ${C.opSym(p.op)} ${p.b}">
     ${carry}
     <span class="cell"></span>${cells(sa)}
@@ -2394,6 +2407,7 @@ function renderProblem(){
   }
   /* 일의 자리부터 입력: 세로셈 말고 다른 문제에도 안내 한 줄 */
   if(smallFirst()&&p.game!=='vert'&&p.fields&&p.fields.some((_,i)=>!isChoice(p,i)))h=`<div class="pwrap">${h}<p class="note">일의 자리부터 눌러요</p></div>`;
+  if(P.last)h=`<div class="pwrap">${h}<p class="lastans">방금 쓴 답: <s>${esc(P.last)}</s>${smallFirst()&&p.fields.some((_,i)=>!isChoice(p,i))?' <small>(일의 자리부터 눌렀는지 확인해 봐!)</small>':''}</p></div>`;
   $('problem').innerHTML=h;
   fitAligned();
 }
@@ -2412,8 +2426,8 @@ function tokHTML(t){return t.map(x=>x&&typeof x==='object'?fbox(x.b):OPS.include
 let BOXLEN={};
 /* 세로셈 답 칸: 자리마다 네모 칸 하나씩(꽃길 산책 세로셈과 같은 방식) → 위 숫자와 같은 자리 줄에 정확히 놓임. 숫자 채우는 방식은 그대로(오른쪽에서 밀려 나옴) */
 function spanBox(i,cols,col,row){BOXLEN[i]=cols;const v=P.inp[i]||'',cells=v.padStart(cols,' ').slice(-cols).split('');
-  const nx=i===P.af&&smallFirst()&&v.length<cols?cols-1-v.length:-1;
-  return cells.map((ch,k)=>`<button type="button" class="fbox dcell${i===P.af?' on':''}${k===nx?' nextc':''}${P.bad[i]?' bad':''}" data-f="${i}" style="grid-row:${row};grid-column:${col+k}" aria-label="답 칸">${ch===' '?'':ch}</button>`).join('');}
+  const nx=i===P.af&&smallFirst()&&!P.bad[i]&&v.length<cols?cols-1-v.length:-1;
+  return cells.map((ch,k)=>`<button type="button" class="fbox dcell${i===P.af?' on':''}${k===nx?' nextc':''}${P.bad[i]?' bad':''}${P.bad[i]&&ch!==' '?' struck':''}" data-f="${i}" style="grid-row:${row};grid-column:${col+k}" aria-label="답 칸">${ch===' '?'':ch}</button>`).join('');}
 function digRow(str,n,startCol,cls){const d=String(str).split('');let h='';const off=n-d.length;d.forEach((ch,i)=>{h+=`<span class="c ${cls||''}" style="grid-column:${startCol+off+i}">${ch}</span>`;});return h;}
 function cardHTML(p){
   BOXLEN={};
@@ -2427,7 +2441,7 @@ function cardHTML(p){
       const fw=Math.max(2,...b.ans.map(x=>String(x).length)),rt=p.tpl==='tree';
       /* 자리 맞춤 카드(tree): 숫자를 한 글자씩 같은 폭(.dg)에 넣음 → 글꼴(주아)의 숫자 폭이 달라도 일·십·백의 자리가 정확히 맞음 */
       const dgs=v=>String(v).split('').map(ch=>`<i class="dg">${esc(ch)}</i>`).join('');
-      const tk=t=>rt?t.map(x=>x&&typeof x==='object'?`<button type="button" style="--fw:${fw}" class="fbox fw rt${x.b===P.af?' on':''}${P.bad[x.b]?' bad':''}" data-f="${x.b}" aria-label="답 칸">${dgs(P.inp[x.b]||'')}</button>`
+      const tk=t=>rt?t.map(x=>x&&typeof x==='object'?`<button type="button" style="--fw:${fw}" class="fbox fw rt${x.b===P.af?' on':''}${P.bad[x.b]?' bad':''}${P.bad[x.b]&&P.inp[x.b]?' struck':''}" data-f="${x.b}" aria-label="답 칸">${dgs(P.inp[x.b]||'')}</button>`
           :(typeof x==='number'||/^\d+$/.test(x))?`<span class="num">${dgs(x)}</span>`:tokHTML([x])).join('')
         :tokHTML(t).split('<button type="button" class="fbox').join(`<button type="button" style="--fw:${fw}" class="fbox fw`);
       const t6=rt&&b.rows.every(r=>{const k=r.t.indexOf('=');return (r.cls||'').includes('tot')||k===3;});
@@ -2470,8 +2484,8 @@ function cardHTML(p){
         <span class="tv">${m[0][0]}</span><span class="tv">${m[0][1]}</span>${fbox(0)}
         <span class="tv">${m[1][0]}</span><span class="tv">${m[1][1]}</span>${fbox(1)}
         ${fbox(2)}${fbox(3)}<span class="cap">${q.op==='+'?'가로 → +<br>세로 ↓ +':'가로 → ×<br>세로 ↓ ×'}</span></div></div>`;}
-    case 'pick':return `<div class="pwrap">${lead}<div class="choices">${b.choices.map((c,i)=>`<button type="button" class="choice${P.inp[0]===String(i)?' on':''}" data-ch="${i}"><span class="no">${i+1}.</span>${esc(c)}</button>`).join('')}</div>${b.rows?`<div class="cbox">${b.rows.map(r=>`<div class="crow ${r.cls||''}">${tokHTML(r.t)}</div>`).join('')}</div>`:''}</div>`;
-    case 'cmp':return `<div class="pwrap">${lead}<div class="cmp"><span>${esc(b.left)}</span><span class="cb">${['<','=','>'].map((x,i)=>`<button type="button" class="choice${P.inp[0]===String(i)?' on':''}" data-ch="${i}" aria-label="${['작아요','같아요','커요'][i]}">${x}</button>`).join('')}</span><span>${esc(b.right)}</span></div></div>`;
+    case 'pick':return `<div class="pwrap">${lead}<div class="choices">${b.choices.map((c,i)=>`<button type="button" class="choice${P.inp[0]===String(i)?' on':''}${P.bad[0]&&P.inp[0]===String(i)?' bad struck':''}" data-ch="${i}"><span class="no">${i+1}.</span>${esc(c)}</button>`).join('')}</div>${b.rows?`<div class="cbox">${b.rows.map(r=>`<div class="crow ${r.cls||''}">${tokHTML(r.t)}</div>`).join('')}</div>`:''}</div>`;
+    case 'cmp':return `<div class="pwrap">${lead}<div class="cmp"><span>${esc(b.left)}</span><span class="cb">${['<','=','>'].map((x,i)=>`<button type="button" class="choice${P.inp[0]===String(i)?' on':''}${P.bad[0]&&P.inp[0]===String(i)?' bad struck':''}" data-ch="${i}" aria-label="${['작아요','같아요','커요'][i]}">${x}</button>`).join('')}</span><span>${esc(b.right)}</span></div></div>`;
   }
   return '';
 }
@@ -2490,8 +2504,18 @@ function maxLen(){return P.p.game==='vert'?C.vertCols(P.p):P.p.game==='card'?(BO
 function overlayOpen(){return !$('forestBox').hidden||!$('goalBox').hidden||!$('celeBox').hidden||!$('stampBox').hidden||!$('clearBox').hidden||!$('explainBox').hidden||!$('gateBox').hidden||!$('momBox').hidden;}
 function giveCandy(){
   if(P.mode==='mission'){state.candy++;return true;}
+  if(!pracCandyOpen())return false;
   const pc=state.pracCandy,td=todayStr();if(pc.date!==td){pc.date=td;pc.n=0;}
-  if(pc.n>=20)return false;pc.n++;state.candy++;return true;
+  const mx=pracMax();if(mx&&pc.n>=mx)return false;pc.n++;state.candy++;return true;
+}
+/* v2.13 연습 별: 하루 최대(20·50·제한 없음=0)는 엄마가 고름. "미션 끝난 뒤에만"을 켜면 오늘의 미션을 끝내야 연습 별을 받음 */
+function pracMax(){const v=state.set.pracMax;return v===0?0:(+v||20);}
+function missionDoneToday(){const t=state.today;return !!(t&&t.done&&t.date===todayStr());}
+function pracCandyOpen(){return !state.set.pracAfter||missionDoneToday();}
+function pracCandyGot(){const pc=state.pracCandy;return pc.date===todayStr()?pc.n:0;}
+function pracCandyText(){
+  if(!pracCandyOpen())return '오늘의 미션을 끝내면 연습에서도 별을 받아요';
+  const mx=pracMax();return mx?'오늘 연습에서 받을 수 있는 별 '+Math.max(0,mx-pracCandyGot())+'개 남음':'한 번에 맞히면 별을 받아요 (오늘 연습 별 '+pracCandyGot()+'개)';
 }
 
 /* ---------- 받아올림 메모 칸: 작은 숫자판 ---------- */
@@ -2532,7 +2556,7 @@ function pracLevels(){
   if(s.pracRange==='all')return Array.from({length:C.READY},(_,i)=>i+1).filter(ok);
   return [...new Set([s.cur].concat(s.review))].filter(ok).sort((a,b)=>a-b);
 }
-function pracCandyLeft(){const pc=state.pracCandy;return pc.date===todayStr()?Math.max(0,20-pc.n):20;}
+function pracCandyLeft(){const mx=pracMax();return mx?Math.max(0,mx-pracCandyGot()):Infinity;}
 function openPractice(tab){
   ensureToday();P.mode='prac';if(tab)PR.tab=tab;renderPractice();show('practice');
 }
@@ -2543,8 +2567,7 @@ function renderPractice(){
   $('pracTabs').querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
   $('growModes').hidden=tab!=='grow';
   $('growModes').querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.g===PR.gmode));
-  const left=pracCandyLeft();
-  $('pracNote').textContent=(tab==='free'?'공부하고 싶은 주제와 난이도를 골라요. 한 번에 10문제!':PR.gmode==='basic'?'20문제를 풀어요. 잘 맞히면 점점 어려워지고, 어려우면 쉬워져요.':`${PR.gmode==='t60'?'1분':'2분'} 동안 최대한 많이 풀어요. 최고 기록에 도전!`)+` · 오늘 연습에서 받을 수 있는 별 ${left}개 남음`;
+  $('pracNote').textContent=(tab==='free'?'공부하고 싶은 주제와 난이도를 골라요. 한 번에 10문제!':PR.gmode==='basic'?'20문제를 풀어요. 잘 맞히면 점점 어려워지고, 어려우면 쉬워져요.':`${PR.gmode==='t60'?'1분':'2분'} 동안 최대한 많이 풀어요. 최고 기록에 도전!`)+' · '+pracCandyText();
   let h='';
   if(tab==='grow')h+=`<div class="topic mix"><b>골고루 섞기</b><span class="tag">여러 주제를 섞어서 내요. 자주 틀린 주제가 더 많이 나와요</span><div class="tools"><button type="button" class="btn primary" data-start="mix">시작</button></div>${PR.gmode!=='basic'?`<span class="tag">${bestText('mix')}</span>`:''}</div>`;
   h+=lv.map(l=>{const L=C.LEVELS[l];
@@ -2592,7 +2615,7 @@ function loadPracProblem(first){
   const ss=PR.sess;
   while(ss.probs.length<=ss.idx)ss.probs.push(nextPracProblem());
   P.p=ss.probs[ss.idx];
-  P.inp=P.p.fields.map(()=>'');P.af=0;P.lock=false;P.busy=false;P.t0=Date.now();P.carry=[];P.dealt=0;P.bad=[];P.hintText='';
+  P.inp=P.p.fields.map(()=>'');P.af=0;P.lock=false;P.busy=false;P.t0=Date.now();P.carry=[];P.dealt=0;P.bad=[];P.last='';P.hintText='';
   P.wrong=(ss.w&&ss.w.i===ss.idx)?ss.w.n:0;
   $('stageTitle').textContent=ss.name+(ss.kind==='free'?' ('+STEP_NM[ss.step-1]+')':'');
   $('progChip').textContent=ss.kind==='time'?'맞힌 문제 '+(ss.idx-ss.skip):(ss.idx+1)+'/'+ss.target+(ss.kind==='grow'?' · '+['쉬움','보통','어려움'][ss.step-1]:'');
@@ -2647,6 +2670,8 @@ function press(k){
   if(isChoice(P.p,P.af)&&k!=='ok'){if(P.p.fields.length>1){P.af=1;}else return;}
   /* v2.9 답 입력 순서: "일의 자리부터"이면 모든 숫자 칸에서 새 숫자를 앞(왼쪽)에 붙임 (세로셈·가로셈·카드 모두) */
   const small=smallFirst();
+  /* 빨간 줄(틀린 숫자)이 있는 칸: 지우기나 숫자를 누르면 먼저 그 칸을 비우고 새로 씀 */
+  if(k!=='ok'&&P.bad[P.af]&&P.inp[P.af]){P.inp[P.af]='';P.bad[P.af]=false;if(k==='del'){tone(SND.tap);renderProblem();return;}}
   if(k==='del'){P.inp[P.af]=small?P.inp[P.af].slice(1):P.inp[P.af].slice(0,-1);tone(SND.tap);}
   else if(k==='ok'){submit();return;}
   else{let v=P.inp[P.af];
@@ -2674,6 +2699,7 @@ function zeroOk(p){
 function submit(){
   /* v2.11 칸이 여러 개인 문제: 확인을 누르면 다음 빈 칸으로 (소리+안내). 비워 두면 0인 칸(올림 없음·나머지 0)은 꼭 채울 칸이 다 차면 0으로 */
   if(P.inp.every(x=>x==='')){tone(SND.hint);say('숫자를 먼저 넣어 줘!');return;}
+  {const bi=P.bad.findIndex((b,i)=>b&&P.inp[i]!=='');if(bi>=0){P.af=bi;tone(SND.hint);say('빨간 줄 그은 칸을 고쳐 줘!');renderProblem();return;}}
   const z=new Set(zeroOk(P.p)),need=P.inp.findIndex((x,i)=>x===''&&!z.has(i));
   if(need>=0){
     let nx=P.inp.findIndex((x,i)=>i>P.af&&x==='');if(nx<0)nx=need;
@@ -2684,6 +2710,7 @@ function submit(){
   const w=$('guideWrap');w.classList.remove('hop','nod');void w.offsetWidth;
   if(g.ok){
     P.lock=true;const dt=liveSec();addSec(dt);
+    if(P.last||P.bad.some(Boolean)){P.last='';P.bad=[];renderProblem();}
     let gotCandy=false;
     if(P.wrong===0){st.first++;gotCandy=giveCandy();}
     st.idx++;st.w=null;
@@ -2705,7 +2732,8 @@ function submit(){
     if(prac&&P.wrong===1){const dn=pracAdapt(false);if(dn)toast(dn);}
     if(prac&&st.kind==='time'&&P.wrong>=2){tone(SND.no);toast('정답은 '+C.explain(p).answer.replace('정답: ','')+'. 다음 문제!');P.lock=true;addSec(liveSec());st.idx++;st.w=null;st.skip=(st.skip||0)+1;pracAdvance(600);return;}
     const type=C.diagnose(p,P.inp,g.res);
-    P.bad=g.res.map(x=>!x);P.inp=P.inp.map((v,i)=>g.res[i]?v:'');P.af=Math.max(0,g.res.findIndex(x=>!x));
+    /* v2.13 틀린 숫자는 지우지 않고 빨간 줄을 그어 남겨 둠 → 그 칸을 누르면 지우고 새로 씀. 방금 쓴 답도 문제 아래에 보여 줌 */
+    {const wr=P.inp.filter((v,i)=>!g.res[i]&&v!=='');P.last=(p.base||p.op==='÷r'||isChoice(p,0)||P.inp.length===1||!wr.length)?inpText(p,P.inp):wr.join(' / ');}P.bad=g.res.map(x=>!x);P.af=Math.max(0,g.res.findIndex(x=>!x));
     tone(SND.no);w.classList.add('nod');
     const pr=$('problem');pr.classList.remove('shake');void pr.offsetWidth;pr.classList.add('shake');
     if(P.wrong===1)say(rndOf(RETRY));
@@ -3088,6 +3116,7 @@ function renderParent(){
   $('giftNow').textContent=state.candy;
   renderSync();
   document.querySelectorAll('input[name=prange]').forEach(r=>r.checked=r.value===s.pracRange);
+  $('pracMaxSel').value=String(pracMax());$('pracAfterChk').checked=!!s.pracAfter;
   const PH=state.pracHist.slice(-10).reverse(),KN={free:'자유 연습',grow:'실력 쑥쑥',time:'시간 도전'};
   $('pracTable').innerHTML='<tr><th>날짜</th><th>종류</th><th>주제</th><th>결과</th><th>난이도</th></tr>'+(PH.length?PH.map(h=>`<tr><td>${h.date.slice(5).replace('-','/')}</td><td>${KN[h.kind]}${h.dur?' '+(h.dur/60)+'분':''}</td><td>${h.lv==='mix'?'골고루 섞기':lvName(h.lv)}</td><td>${h.kind==='time'?h.score+'문제':h.first+'/'+h.total}</td><td>${h.step}${h.end&&h.end!==h.step?' → '+h.end:''}</td></tr>`).join(''):'<tr><td colspan="5">아직 연습 기록이 없어요</td></tr>');
   // 캐릭터
@@ -3117,6 +3146,8 @@ $('applyToday').onclick=e=>armBtn(e.currentTarget,()=>{newToday();toast('오늘 
 $('cntRows').addEventListener('click',e=>{const b=e.target.closest('[data-cnt]');if(!b)return;const i=+b.dataset.cnt,s=state.set;if(i===2)return;s.counts[i]=Math.max(4,Math.min(15,s.counts[i]+(+b.dataset.d)));save();renderParent();});
 $('limitSel').onchange=e=>{state.set.limit=+e.target.value;save();};
 $('pracRadios').onchange=e=>{state.set.pracRange=e.target.value;save();};
+$('pracMaxSel').onchange=()=>{state.set.pracMax=+$('pracMaxSel').value;save();toast(pracMax()?'연습 별을 하루 '+pracMax()+'개까지 받아요':'연습 별 제한을 없앴어요');};
+$('pracAfterChk').onchange=()=>{state.set.pracAfter=$('pracAfterChk').checked;save();toast(state.set.pracAfter?'오늘의 미션을 끝낸 뒤에만 연습 별을 받아요':'미션 전에도 연습 별을 받아요');};
 $('orderRadios').onchange=e=>{state.set.order=e.target.value;save();toast(e.target.value==='big'?'큰 자리부터 입력해요':'일의 자리부터 입력해요');};
 $('memoRadios').onchange=e=>{state.set.memo=e.target.value==='1';save();};
 $('t3Radios').onchange=e=>{state.set.t3h=e.target.value==='1';save();};
