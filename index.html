@@ -749,6 +749,7 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
         <div class="radios" id="orderRadios">
           <label><input type="radio" name="order" value="big" id="orderBig"> 큰 자리부터 (972 → 9, 7, 2) · 모든 문제</label>
           <label><input type="radio" name="order" value="small" id="orderSmall"> 일의 자리부터 (972 → 2, 7, 9) · 세로셈·가로셈·카드 모든 문제</label>
+          <label><input type="radio" name="order" value="mix" id="orderMix"> 섞어서: <b>가로셈은 큰 자리부터, 세로셈은 일의 자리부터</b> · 세로셈과 세로식 카드(올림 숫자 쓰기, 세로셈 두 줄 쓰기)만 일의 자리부터. 줄지어 있는 카드·세로 나눗셈·몫과 나머지·시간과 단위는 큰 자리부터</label>
         </div>
       </div>
       <div class="row" style="align-items:flex-start">
@@ -1752,8 +1753,8 @@ function save(){
    웹앱 버전(BUILD='web')에서만 동작. 테스트판(claude 링크)과 공개 출시판에서는 꺼짐.
    가족 코드는 이 기기에만 저장되고, 서버에는 코드의 해시(암호화된 지문)만 저장됨. */
 const BUILD='web';
-const APP_VER='2.13 · 2026-10-16';
-const APP_BUILD='01985554c1';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
+const APP_VER='2.14 · 2026-10-18';
+const APP_BUILD='330447ec8e';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
 const SYNC_DEFAULT={"url": "https://mupsdurscfkbuptmsxtr.supabase.co", "key": "sb_publishable_3Wa_MeVRfkQI0JEysg2PZA_F6PfrZQ8"};
 const SKEY='numforest-sync';
 const SYNC={
@@ -2353,7 +2354,7 @@ function fbox(i,small){const lab=P.p.fields[i].label;
 function vertHTML(p){
   const sa=String(p.a),sb=String(p.b),n=C.vertCols(p),cols=n+1,ans=P.inp[0]||'';
   const cells=(str,cls)=>str.padStart(n,' ').slice(-n).split('').map(ch=>`<span class="cell ${cls||''}">${ch===' '?'':ch}</span>`).join('');
-  const memo=state.set.memo!==false,small=state.set.order==='small';
+  const memo=state.set.memo!==false,small=smallFirst(p);
   const carry=memo?'<span class="cell memo-lab" aria-hidden="true"><span>✏️</span><span>메모</span></span>'+Array.from({length:n},(_,i)=>`<button type="button" class="carry${P.memoI===i?' on':''}" data-c="${i}" aria-label="메모 칸">${P.carry[i]||''}</button>`).join(''):'';
   /* 답 칸: 큰 자리부터(계산기처럼 오른쪽에서 밀려 나옴) 또는 일의 자리부터. 일의 자리부터일 때 다음 칸을 노랗게 표시 */
   const next=small&&!P.bad[0]?n-1-ans.length:-1;
@@ -2661,7 +2662,10 @@ function finishPrac(){
   $('clearBox').hidden=false;$('clearOk').focus();
 }
 
-function smallFirst(){return state.set.order==='small';}
+/* 답 입력 순서: big=모두 큰 자리부터, small=모두 일의 자리부터,
+   mix(v2.14)=세로셈(꽃길 산책 등)과 세로식 카드(올림 숫자 쓰기·세로셈 두 줄 쓰기)만 일의 자리부터, 나머지는 큰 자리부터 */
+function vertLike(p){return !!p&&(p.game==='vert'||p.game==='card'&&(p.tpl==='carry'||p.tpl==='pp'));}
+function smallFirst(p){const o=state.set.order;return o==='small'||o==='mix'&&vertLike(p||P.p);}
 function press(k){
   if(P.lock||P.busy||$('play').hidden||overlayOpen())return;
   if(P.memoI>=0){const i=P.memoI;
@@ -3148,7 +3152,7 @@ $('limitSel').onchange=e=>{state.set.limit=+e.target.value;save();};
 $('pracRadios').onchange=e=>{state.set.pracRange=e.target.value;save();};
 $('pracMaxSel').onchange=()=>{state.set.pracMax=+$('pracMaxSel').value;save();toast(pracMax()?'연습 별을 하루 '+pracMax()+'개까지 받아요':'연습 별 제한을 없앴어요');};
 $('pracAfterChk').onchange=()=>{state.set.pracAfter=$('pracAfterChk').checked;save();toast(state.set.pracAfter?'오늘의 미션을 끝낸 뒤에만 연습 별을 받아요':'미션 전에도 연습 별을 받아요');};
-$('orderRadios').onchange=e=>{state.set.order=e.target.value;save();toast(e.target.value==='big'?'큰 자리부터 입력해요':'일의 자리부터 입력해요');};
+$('orderRadios').onchange=e=>{state.set.order=e.target.value;save();toast(e.target.value==='big'?'큰 자리부터 입력해요':e.target.value==='mix'?'가로셈은 큰 자리부터, 세로셈은 일의 자리부터 입력해요':'일의 자리부터 입력해요');};
 $('memoRadios').onchange=e=>{state.set.memo=e.target.value==='1';save();};
 $('t3Radios').onchange=e=>{state.set.t3h=e.target.value==='1';save();};
 $('redoRadios').onchange=e=>{state.set.redo=e.target.value==='1';save();};
