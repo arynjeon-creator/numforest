@@ -1804,8 +1804,8 @@ function save(){
    웹앱 버전(BUILD='web')에서만 동작. 테스트판(claude 링크)과 공개 출시판에서는 꺼짐.
    가족 코드는 이 기기에만 저장되고, 서버에는 코드의 해시(암호화된 지문)만 저장됨. */
 const BUILD='web';
-const APP_VER='2.15 · 2026-10-23';
-const APP_BUILD='b63c8a0f5e';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
+const APP_VER='2.16 · 2026-10-23';
+const APP_BUILD='b481027639';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
 const SYNC_DEFAULT={"url": "https://mupsdurscfkbuptmsxtr.supabase.co", "key": "sb_publishable_3Wa_MeVRfkQI0JEysg2PZA_F6PfrZQ8"};
 const SKEY='numforest-sync';
 const SYNC={
@@ -2191,6 +2191,10 @@ const FOREST=[
  {name:'달빛 숲',s1:'#9AA9DD',s2:'#D4DBF3',g:'#6FA98A',t:'#2F6F55'}];
 function areaName(i){const r=Math.floor(i/FOREST.length);return FOREST[i%FOREST.length].name+(r?' '+(r+1):'');}
 function forestN(){const n=+state.set.forestN;return [15,20,30].includes(n)?n:20;}
+function hidOffPool(id){
+  if(!id||(state.set.pool==='custom'&&!chars.length))return false;
+  return !pool().some(c=>c.id===id);
+}
 function pickHidden(){const left=pool().filter(c=>!state.col.includes(c.id));return left.length?left[Math.floor(Math.random()*left.length)].id:null;}
 function ensureForest(){
   let f=state.forest;
@@ -2203,7 +2207,10 @@ function ensureForest(){
   }
   if(!Array.isArray(f.done))f.done=[];
   if(f.lit>=forestN())f.lit=forestN()-1;
-  if(!f.hid||state.col.includes(f.hid)||!findChar(f.hid))f.hid=pickHidden();
+  if(!f.hid||state.col.includes(f.hid)||!findChar(f.hid)){const old=f.hid;f.hid=pickHidden();if(f.hid!==old&&!OBS)save();}
+  /* v2.16 숨은 친구가 지금 설정("알에서 나올 친구")의 목록에 없으면 다시 고름. 반딧불·다이아몬드·구역은 그대로.
+     엄마 친구 그림이 아직 없는 기기(앱 친구로 대신하는 중)에서는 바꾸지 않음. 관찰 모드에서도 바꾸지 않음 */
+  else if(!OBS&&hidOffPool(f.hid)){const old=f.hid;f.hid=pickHidden();if(f.hid!==old)save();}
   return f;
 }
 function addDiamond(d){
@@ -3520,7 +3527,9 @@ $('myList').addEventListener('click',e=>{
 });
 $('poolRadios').addEventListener('change',e=>{
   if(e.target.name!=='pool')return;state.set.pool=e.target.value;save();
-  toast(state.set.pool==='custom'&&!chars.length?'캐릭터를 먼저 넣어 주세요. 그 전까지는 기본 친구가 나와요.':'바꿨어요');
+  const f=state.forest,old=f&&f.hid;ensureForest();const moved=!!(f&&state.forest.hid!==old);
+  if(moved)renderParent();
+  toast(state.set.pool==='custom'&&!chars.length?'캐릭터를 먼저 넣어 주세요. 그 전까지는 기본 친구가 나와요.':moved?'바꿨어요. 숲에 숨은 친구도 새 설정에 맞게 바꿨어요':'바꿨어요');
 });
 
 /* 테스트 도구 */
