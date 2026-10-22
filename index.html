@@ -69,6 +69,10 @@ button.chip:active{transform:translateY(2px)}
 .avatar .it{position:absolute;transform:translate(-50%,-50%);pointer-events:none;line-height:0}
 .avatar .it svg{width:100%;height:auto;display:block}
 .sil{filter:brightness(0);opacity:.16}
+.sil-wait{display:block;width:100%;height:100%}
+.farea .mon.hid .sil{opacity:1}
+/* 그림을 길게 눌러도 저장·복사 메뉴가 뜨지 않게 */
+img,svg{-webkit-touch-callout:none;-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
 .bob{animation:bob 2.4s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-6px)}}
 
@@ -400,6 +404,27 @@ button.card:active{transform:translateY(2px)}
 .pv{background:var(--white);border:2px dashed var(--line);border-radius:14px;padding:10px 14px;font-size:calc(16px * var(--fs));line-height:1.7}
 
 .chip.menu{background:#FFF4D6;border-color:#F3D98A;font-family:var(--font-display)}
+/* v2.15 거래: 조건을 다 채우면 분홍색 */
+.chip.menu.ready{background:#FFD6E7;border-color:#FF8FB1;color:#B0245C;animation:tradeGlow 1.6s ease-in-out infinite}
+@keyframes tradeGlow{50%{box-shadow:0 0 0 5px rgba(255,143,177,.35)}}
+@media (prefers-reduced-motion:reduce){.chip.menu.ready{animation:none}}
+.trade{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:760px){.trade{grid-template-columns:1.1fr 1fr}}
+.tcard{background:var(--paper);border:3px solid var(--line);border-radius:28px;padding:18px;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;min-width:0}
+.tcard.ok{border-color:#FF8FB1;background:#FFF3F8}
+.tcard h2{font-family:var(--font-display);font-weight:400;font-size:calc(22px * var(--fh));margin:0}
+.swap{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;font-family:var(--font-display);font-size:calc(26px * var(--fh))}
+.swap .side{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--white);border:3px solid var(--line);border-radius:22px;padding:10px 18px;min-width:110px}
+.swap .side svg{width:52px;height:52px}
+.swap .arr{font-size:calc(34px * var(--fh));color:var(--ink-soft)}
+@media (max-width:480px){.swap{font-size:calc(19px * var(--fh));gap:8px;flex-wrap:nowrap}.swap .side{min-width:0;padding:8px 10px}.swap .side svg{width:38px;height:38px}}
+#tradeBtn.armed{background:#FF8FB1;border-color:#E0628C;color:#fff}
+.tlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;width:100%;text-align:left}
+.tlist li{display:flex;align-items:center;gap:10px;background:var(--white);border:3px solid var(--line);border-radius:16px;padding:8px 12px;font-size:calc(17px * var(--fs))}
+.tlist li .ck{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);background:#EEF2F5;color:var(--ink-soft)}
+.tlist li.done .ck{background:var(--grass);color:#fff}
+.tlist li.done{border-color:#BFE6CC}
+.tlist small{color:var(--ink-soft)}
 .topics{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(270px,100%),1fr));gap:12px}
 .topic{background:var(--paper);border:3px solid var(--line);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:8px}
 .topic b{font-family:var(--font-display);font-weight:400;font-size:calc(21px * var(--fs))}
@@ -487,6 +512,7 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
     <div class="updbar" id="updBar" hidden><span>✨ 새 버전이 나왔어요!</span><button class="btn primary" id="updGo" type="button">새로 고침</button></div>
     <div class="topbar">
       <h1 class="logo">숫자숲 탐험대<small id="logoSub">초등 연산</small></h1>
+      <button class="chip menu" id="toTrade" type="button">거래</button>
       <button class="chip menu" id="toFree" type="button">자유 연습</button>
       <button class="chip menu" id="toGrow" type="button">실력 쑥쑥 연습</button>
       <button class="chip menu" id="toRules" type="button">게임 규칙</button>
@@ -601,6 +627,30 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
     <div class="tabs" id="growModes" hidden><button type="button" class="tab" data-g="basic">기본 (20문제)</button><button type="button" class="tab" data-g="t60">1분 도전</button><button type="button" class="tab" data-g="t120">2분 도전</button></div>
     <p class="note" id="pracNote"></p>
     <div class="topics" id="topicGrid"></div>
+  </section>
+
+  <!-- 거래 (v2.15): 별 100개 → 다이아몬드 2개, 하루 한 번 -->
+  <section class="screen" id="trade" hidden>
+    <div class="topbar">
+      <button class="chip" id="tradeBack" type="button">← 오늘의 미션</button>
+      <h1 class="logo sm">거래</h1>
+      <span class="chip candy" id="tradeCandy"></span>
+    </div>
+    <div class="partner-row"><div class="av bob" id="tradeMon"></div><div class="bubble" id="tradeBubble"></div></div>
+    <div class="trade">
+      <div class="tcard" id="tradeCard">
+        <h2>별을 다이아몬드로 바꿔요</h2>
+        <div class="swap"><div class="side" id="tradeStarSide"></div><span class="arr">→</span><div class="side" id="tradeDiaSide"></div></div>
+        <button class="big" id="tradeBtn" type="button">바꾸기</button>
+        <p class="note" id="tradeWhy"></p>
+      </div>
+      <div class="tcard">
+        <h2>오늘의 거래 조건</h2>
+        <ul class="tlist" id="tradeList"></ul>
+        <button class="btn" id="tradeToFree" type="button">자유 연습 하러 가기</button>
+        <p class="note">조건은 매일 새로 시작해요. 거래는 하루에 한 번이에요.</p>
+      </div>
+    </div>
   </section>
 
   <!-- 게임 규칙 (아이가 까먹었을 때) -->
@@ -809,7 +859,7 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
         <select class="sel" id="pracMaxSel"><option value="20">20개 (기본)</option><option value="50">50개</option><option value="0">제한 없음</option></select>
       </div>
       <label class="row" style="gap:10px;cursor:pointer"><input type="checkbox" id="pracAfterChk" style="width:24px;height:24px;accent-color:var(--grass-deep)"> 오늘의 미션을 끝낸 뒤에만 연습 별 받기</label>
-      <p>연습에서는 한 번에 맞힌 문제마다 별 1개를 받아요. 도장과 다이아몬드는 오늘의 미션에서만 받아요.</p>
+      <p>연습에서는 한 번에 맞힌 문제마다 별 1개를 받아요. 도장은 오늘의 미션에서만, 다이아몬드는 오늘의 미션과 <b>거래</b>(자유 연습 '어려움' 서로 다른 주제 3개를 8개 이상 + 별 100개 → 다이아몬드 2개, 하루 한 번)로 받아요.</p>
       <div class="tbl"><table id="pracTable"></table></div>
     </div>
 
@@ -895,7 +945,7 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
     <div class="av bob" id="clearMon" style="margin-top:-56px"></div>
     <h3 id="clearTitle"></h3>
     <div class="stars" id="clearStars"></div>
-    <p id="clearText" style="margin:0;font-size:18px;line-height:1.5"></p>
+    <p id="clearText" style="margin:0;font-size:18px;line-height:1.5;white-space:pre-line"></p>
     <button class="big" id="clearOk" type="button">다음</button>
     <button class="btn" id="clearMap" type="button">지도로 가기</button>
   </div>
@@ -1685,7 +1735,7 @@ let OBS=null;
 function todayStr(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function dayDiff(a,b){return Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/86400000);}
 function addDays(s,n){const d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return todayStr(d);}
-function defaults(){return {v:2,set:{cur:9,step:1,review:[1,3,4,5,6,7,8],off:[],auto:'approve',counts:[8,8,8,8,8],limit:0,pool:'both',order:'big',memo:true,t3h:true,redo:true,pracRange:'open',sem:'3-2',semLock:true,ahead:false,forestN:20,pracMax:20,pracAfter:false},today:null,col:[],partner:null,candy:0,items:[],wear:{},adj:{},hist:[],streak:{last:null,n:0},pendingUp:false,pin:'0000',rev:0,msgs:[],stamps:{set:0,pin:0},best:{},pracHist:[],skill:{},pracCandy:{date:'',n:0},cards:{},grad:[],dojang:{n:0,board:[],eggs:0,init:false},mig2:false,forest:null,met:{}};}
+function defaults(){return {v:2,set:{cur:9,step:1,review:[1,3,4,5,6,7,8],off:[],auto:'approve',counts:[8,8,8,8,8],limit:0,pool:'both',order:'big',memo:true,t3h:true,redo:true,pracRange:'open',sem:'3-2',semLock:true,ahead:false,forestN:20,pracMax:20,pracAfter:false},today:null,col:[],partner:null,candy:0,items:[],wear:{},adj:{},hist:[],streak:{last:null,n:0},pendingUp:false,pin:'0000',rev:0,msgs:[],stamps:{set:0,pin:0},best:{},pracHist:[],skill:{},pracCandy:{date:'',n:0},cards:{},grad:[],dojang:{n:0,board:[],eggs:0,init:false},mig2:false,forest:null,met:{},trades:[]};}
 function load(){
   let s=null;try{s=JSON.parse(localStorage.getItem(KEY));}catch(e){}
   return normalize(s,true);
@@ -1712,6 +1762,7 @@ function normalize(s,local){
   if(!s.dojang.init){const days=[...new Set((s.hist||[]).map(h=>h.date))].sort().slice(-29);s.dojang.board=days.map(d=>({d,g:false}));s.dojang.n=days.length;s.dojang.init=true;}
   delete s.pendingEgg;
   if(!s.met||typeof s.met!=='object')s.met={};
+  if(!Array.isArray(s.trades))s.trades=[];
   /* v2.1: 개울 건너기가 카드로 바뀜 → 오늘 시작 전이면 새로 만듦 */
   if(s.today&&!s.today.done&&s.today.stages&&!s.today.v21&&s.today.stages.every(x=>x.idx===0))s.today=null;
   return s;
@@ -1753,8 +1804,8 @@ function save(){
    웹앱 버전(BUILD='web')에서만 동작. 테스트판(claude 링크)과 공개 출시판에서는 꺼짐.
    가족 코드는 이 기기에만 저장되고, 서버에는 코드의 해시(암호화된 지문)만 저장됨. */
 const BUILD='web';
-const APP_VER='2.14 · 2026-10-18';
-const APP_BUILD='330447ec8e';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
+const APP_VER='2.15 · 2026-10-23';
+const APP_BUILD='b63c8a0f5e';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
 const SYNC_DEFAULT={"url": "https://mupsdurscfkbuptmsxtr.supabase.co", "key": "sb_publishable_3Wa_MeVRfkQI0JEysg2PZA_F6PfrZQ8"};
 const SKEY='numforest-sync';
 const SYNC={
@@ -1977,8 +2028,23 @@ function monsterSVG(m,locked){
   return `<svg viewBox="-4 -4 128 128" aria-hidden="true"><defs><radialGradient id="${k}"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>${back}${arms}${feet}${body}${shine}${face}${front}</svg>`;
 }
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* v2.15 아직 못 만난 친구: 진짜 그림을 페이지에 넣지 않고, 미리 까맣게 칠한 그림자 그림만 넣음
+   (길게 눌러 이미지 저장·복사로 진짜 그림을 볼 수 없게) */
+const SILC={},SILQ={};let silT=null;
+function silSrc(ch){
+  const k=ch.id+'|'+ch.img.length;if(SILC[k])return SILC[k];
+  if(!SILQ[k]){SILQ[k]=1;const im=new Image();im.onload=()=>{try{
+      const sc=Math.min(1,320/Math.max(im.naturalWidth,im.naturalHeight)),cv=document.createElement('canvas');
+      cv.width=Math.max(1,Math.round(im.naturalWidth*sc));cv.height=Math.max(1,Math.round(im.naturalHeight*sc));
+      const g=cv.getContext('2d');g.drawImage(im,0,0,cv.width,cv.height);g.globalCompositeOperation='source-in';g.fillStyle='#000';g.fillRect(0,0,cv.width,cv.height);
+      SILC[k]=cv.toDataURL('image/png');}catch(e){SILC[k]='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';}
+      clearTimeout(silT);silT=setTimeout(()=>{if(!$('collection').hidden)renderCollection();if(!$('home').hidden)renderForest();},30);};
+    im.src=ch.img;}
+  return null;
+}
 function charHTML(ch,locked){
-  if(ch.img)return `<img src="${ch.img}" alt="${locked?'아직 못 만난 친구':esc(ch.name)}" class="${locked?'sil':''}">`;
+  if(ch.img&&locked){const u=silSrc(ch);return u?`<img src="${u}" alt="아직 못 만난 친구" class="sil" draggable="false">`:'<span class="sil-wait" aria-label="아직 못 만난 친구"></span>';}
+  if(ch.img)return `<img src="${ch.img}" alt="${esc(ch.name)}" draggable="false">`;
   return monsterSVG(ch,locked);
 }
 function getAdj(pid,slot){const a=(state.adj[pid]||{})[slot];if(a)return a;const ch=findChar(pid);return ch&&ch.adj&&ch.adj[slot]?ch.adj[slot]:{dx:0,dy:0,ds:1};}
@@ -2040,7 +2106,7 @@ function sceneHTML(key){const img=SCENE_IMG[key];return img?`<img src="${img}" a
 function setScene(key){const el=$('scene');if(el)el.innerHTML=sceneHTML(key);}
 
 /* ---------- 화면 전환 ---------- */
-const SCREENS=['home','play','reward','collection','decoScr','parent','practice','report','rules'];
+const SCREENS=['home','play','reward','collection','decoScr','parent','practice','report','rules','trade'];
 function show(id){SCREENS.forEach(s=>$(s).hidden=(s!==id));window.scrollTo(0,0);if(id!=='play'){stopTicker();closeMemoPad();}if(id==='home'){if(SYNC.pending)SYNC.applyIfIdle();setTimeout(()=>{if(!$('home').hidden)showMomMsg();},400);}}
 
 /* ---------- 홈 ---------- */
@@ -2055,6 +2121,7 @@ function showCele(){
 }
 $('celeOk').onclick=()=>{$('celeBox').hidden=true;delete state.cele;save();};
 function renderHome(){
+  {const tb=$('toTrade');if(tb){const ti=tradeInfo();tb.classList.toggle('ready',ti.ready);tb.textContent=ti.ready?'거래 ✨':'거래';}}
   ensureToday();
   if(state.cele){delete state.cele;}
   const t=T(),s=state.set,L=C.LEVELS[s.cur];
@@ -2172,7 +2239,7 @@ function fireflies(i,lit,N){
   for(let j=0;j<N;j++){const x=10+r()*180,y=10+r()*70;h+=j<lit?`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="#FFE27A" opacity=".35"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.9" fill="#FFF6C2"/>`:`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.2" fill="#9FB3C8" opacity=".45"/>`;}
   return h+'</svg>';
 }
-function monBox(id,hid){const c=id&&findChar(id);if(!c)return '';return `<div class="mon${hid?' hid':''}">${charHTML(c)}</div>`;}
+function monBox(id,hid){const c=id&&findChar(id);if(!c)return '';return `<div class="mon${hid?' hid':''}">${charHTML(c,hid)}</div>`;}
 const CHEST_SVG='<svg viewBox="0 0 60 50"><rect x="6" y="18" width="48" height="28" rx="5" fill="#C98A4B" stroke="#8A5A2B" stroke-width="3"/><path d="M6 22 Q30 2 54 22" fill="#E0A55F" stroke="#8A5A2B" stroke-width="3"/><rect x="26" y="24" width="8" height="10" rx="2" fill="#FFD166"/></svg>';
 function areaTile(i,kind,f,N){
   const nm=areaName(i);
@@ -2203,6 +2270,67 @@ function closeForestFind(){$('forestBox').hidden=true;if(state.forest)state.fore
 $('forestOk').onclick=()=>{const id=state.forest&&state.forest.pend&&state.forest.pend.id;closeForestFind();renderCollection();show('collection');};
 $('forestPartner').onclick=()=>{const id=state.forest&&state.forest.pend&&state.forest.pend.id;if(id&&id!=='chest'){state.partner=id;toast(josa(findChar(id).name,'이가')+' 짝꿍이 되었어요!');}closeForestFind();renderHome();};
 $('forestClose').onclick=()=>{closeForestFind();renderHome();};
+
+/* ---------- 거래 (v2.15) ----------
+   조건(오늘): 자유 연습 '어려움'에서 10문제 중 한 번에 8개 이상 맞힌 주제가 서로 다른 3개 + 별 100개 이상.
+   거래: 별 100개 → 다이아몬드 2개(숲 반딧불 2개), 하루 한 번(다이아몬드 하루 최대 2개). 조건은 매일 새로 시작 */
+const TRADE={topics:3,min:8,cost:100,gain:2};
+function tradePassed(day){day=day||todayStr();const out=[];
+  (state.pracHist||[]).forEach(h=>{if(h.date===day&&h.kind==='free'&&h.step===3&&h.total>=10&&h.first>=TRADE.min&&typeof h.lv==='number'&&!out.includes(h.lv))out.push(h.lv);});
+  return out;}
+function tradeInfo(){
+  const td=todayStr(),passed=tradePassed(td),need=Math.max(0,TRADE.topics-passed.length),stars=Math.max(0,TRADE.cost-state.candy),done=(state.trades||[]).some(x=>x.d===td);
+  return {passed,need,stars,done,ready:!done&&!need&&!stars};
+}
+function tradeMsg(ti){
+  if(ti.done)return '오늘 거래는 끝! 내일 또 와.';
+  if(ti.ready)return '거래할 수 있어! 별 '+TRADE.cost+'개를 다이아몬드 '+TRADE.gain+'개로 바꿔 볼까?';
+  if(ti.need&&ti.stars)return `서로 다른 주제 ${ti.need}개를 더 '어려움'에서 ${TRADE.min}개 이상 맞히고, 별 ${ti.stars}개를 더 모으면 돼!`;
+  if(ti.need)return `서로 다른 주제 ${ti.need}개를 더 '어려움'에서 ${TRADE.min}개 이상 맞히면 돼!`;
+  return `다 했어! 이제 별 ${ti.stars}개만 더 모으면 돼!`;
+}
+let tradeArmed=false;
+function openTrade(){tradeArmed=false;renderTrade();show('trade');}
+function renderTrade(){
+  const ti=tradeInfo(),p=partner();
+  $('tradeMon').innerHTML=avatarHTML(p);
+  $('tradeBubble').innerHTML=`<b>${esc(p.name)}</b><br>${esc(tradeMsg(ti))}`;
+  $('tradeCandy').innerHTML=CANDY_IC+' '+state.candy;
+  $('tradeDiaSide').innerHTML=diaSVG(true)+'<span>다이아몬드 '+TRADE.gain+'개</span>';
+  $('tradeStarSide').innerHTML=CANDY_IC+'<span>별 '+TRADE.cost+'개</span>';
+  $('tradeCard').classList.toggle('ok',ti.ready);
+  const b=$('tradeBtn');b.disabled=!ti.ready||!!OBS;b.classList.toggle('armed',tradeArmed&&ti.ready);
+  b.textContent=ti.done?'오늘 거래 완료':tradeArmed&&ti.ready?'한 번 더 누르면 바꿔요':'바꾸기';
+  $('tradeWhy').textContent=OBS?'관찰 모드에서는 거래할 수 없어요.':ti.done?'내일 다시 조건을 채우면 또 거래할 수 있어요.':ti.ready?'두 번 눌러야 바꿔져요.':tradeMsg(ti);
+  const names=ti.passed.map(l=>C.LEVELS[l]?C.LEVELS[l].name:'Lv'+l);
+  let h='';
+  for(let i=0;i<TRADE.topics;i++)h+=i<names.length?`<li class="done"><span class="ck">✔</span><span><b>${esc(names[i])}</b> <small>어려움 통과</small></span></li>`
+    :`<li><span class="ck">${i+1}</span><span>다른 주제 '어려움'에서 ${TRADE.min}개 이상 맞히기</span></li>`;
+  h+=`<li class="${ti.stars?'':'done'}"><span class="ck">${ti.stars?'★':'✔'}</span><span>별 ${TRADE.cost}개 이상 <small>(지금 ${state.candy}개${ti.stars?', '+ti.stars+'개 더':''})</small></span></li>`;
+  $('tradeList').innerHTML=h;
+  $('tradeToFree').hidden=!ti.need||ti.done;
+}
+function doTrade(){
+  if(OBS)return;const ti=tradeInfo();if(!ti.ready){tradeArmed=false;renderTrade();return;}
+  if(!tradeArmed){tradeArmed=true;tone(SND.tap);renderTrade();return;}
+  tradeArmed=false;const td=todayStr();
+  state.candy-=TRADE.cost;let found=false;
+  for(let i=0;i<TRADE.gain;i++)found=addDiamond(td)||found;
+  state.trades.push({d:td,at:Date.now(),cost:TRADE.cost,gain:TRADE.gain,lv:ti.passed.slice()});state.trades=state.trades.slice(-60);
+  save();tone(SND.clear);renderTrade();
+  $('tradeBubble').innerHTML=`<b>${esc(partner().name)}</b><br>거래 성공! 다이아몬드 ${TRADE.gain}개로 숲에 반딧불 ${TRADE.gain}개가 켜졌어!${found?' 숲이 환해졌어. 지도로 가서 확인해 봐!':''}`;
+  toast('별 '+TRADE.cost+'개 → 다이아몬드 '+TRADE.gain+'개');
+}
+$('toTrade').onclick=()=>{tone(SND.tap);openTrade();};
+$('tradeBack').onclick=()=>{tradeArmed=false;renderHome();show('home');};
+$('tradeBtn').onclick=()=>doTrade();
+$('tradeToFree').onclick=()=>{tone(SND.tap);openPractice('free');};
+
+function tradeReportHTML(){
+  const T5=(state.trades||[]).slice(-5).reverse(),ti=tradeInfo();
+  const today=`오늘 거래 조건: 어려움 통과 주제 ${ti.passed.length}/${TRADE.topics}${ti.passed.length?' ('+ti.passed.map(l=>esc(C.LEVELS[l]?C.LEVELS[l].name:'Lv'+l)).join(', ')+')':''} · ${ti.done?'오늘 거래함':ti.ready?'거래 가능':'아직'}`;
+  return `<p class="note"><b>거래</b> · ${today}</p>`+(T5.length?`<ul class="plain">${T5.map(x=>`<li>${x.d.slice(5).replace('-','/')} 거래: 별 ${x.cost||TRADE.cost}개 → 다이아몬드 ${x.gain||TRADE.gain}개</li>`).join('')}</ul>`:'');
+}
 
 /* ---------- 엄마 관찰 모드 ---------- */
 function startObserve(){
@@ -2247,10 +2375,11 @@ function renderRules(){
   ensureForest();
   $('rulesBody').innerHTML=`
     <div class="rule-card"><h3><span class="ic">${CANDY_IC}</span>별</h3><p>문제를 <b>한 번에</b> 맞히면 별 <b>1개</b>!</p><p>별로 꾸미기 방에서 짝꿍을 꾸밀 수 있어. ${state.set.pracAfter?'연습 별은 오늘의 미션을 끝낸 뒤에 받아'+(pracMax()?'. 하루 '+pracMax()+'개까지야.':'.'):pracMax()?'연습에서는 하루에 '+pracMax()+'개까지 받아.':'연습에서도 받을 수 있어.'}</p></div>
-    <div class="rule-card"><h3><span class="ic">${dia}</span>다이아몬드</h3><p>오늘의 미션 스테이지 ${n8}문제를 <b>하나도 안 틀리고</b> 모두 한 번에 맞히면 반짝 다이아몬드!</p><p>다이아몬드 하나마다 <b>숲에 반딧불이 하나</b> 켜져. 반딧불 <b>${forestN()}개</b>가 켜지면 숲이 환해지고, 어둠 속에 숨어 있던 <b>친구</b>를 찾을 수 있어!</p></div>
+    <div class="rule-card"><h3><span class="ic">${dia}</span>다이아몬드</h3><p>오늘의 미션 스테이지 ${n8}문제를 <b>하나도 안 틀리고</b> 모두 한 번에 맞히면 반짝 다이아몬드! <b>거래</b>로도 받을 수 있어.</p><p>다이아몬드 하나마다 <b>숲에 반딧불이 하나</b> 켜져. 반딧불 <b>${forestN()}개</b>가 켜지면 숲이 환해지고, 어둠 속에 숨어 있던 <b>친구</b>를 찾을 수 있어!</p></div>
+    <div class="rule-card"><h3><span class="ic">🤝</span>거래</h3><p><b>별 ${TRADE.cost}개</b>를 <b>다이아몬드 ${TRADE.gain}개</b>로 바꿀 수 있어! 하루에 <b>한 번</b>이야.</p><p>조건: 자유 연습에서 <b>서로 다른 주제 ${TRADE.topics}개</b>를 '어려움'으로 풀어서, 10문제 중 <b>${TRADE.min}개 이상</b> 한 번에 맞히기. 그리고 별 ${TRADE.cost}개 이상!</p><p>조건을 다 채우면 홈의 <b>거래</b> 버튼이 분홍색으로 바뀌어. 조건은 매일 새로 시작해.</p></div>
     <div class="rule-card"><h3><span class="ic">📮</span>도장</h3><p>오늘의 미션 5개를 다 끝내면 도장 <b>1개</b>!</p><p><b>7일 연속</b>으로 하면 금도장을 하나 더 줄게! 하루 쉬면 연속은 1일부터 다시지만, 모은 도장은 그대로야.</p><p>도장 <b>${BOARD}개</b>가 모이면 황금 알에서 <b>새 친구</b>가 나와. 친구를 다 모았으면 알에서 별 60개가 나와.</p></div>
     <div class="rule-card"><h3><span class="ic">🌳</span>오늘의 탐험</h3><p>신발 끈 묶기 → 꽃길 산책 → 개울 건너기 → 언덕 오르기 → 기억 열매 따기</p><p>틀리면 다시 기회가 있고, 두 번 틀리면 힌트, 세 번 틀리면 같이 풀어 봐.</p></div>
-    <div class="rule-card"><h3><span class="ic">🧭</span>내 기록</h3><div class="mine"><span>별 ${state.candy}개</span><span>도장 ${dj.board.length}/${BOARD}</span><span>연속 ${sk}일</span><span>다이아몬드 ${ensureForest().dia}개</span><span>숲 ${areaName(state.forest.area)} ${state.forest.lit}/${forestN()}</span><span>도감 ${$('colCount').textContent}</span></div></div>`;
+    <div class="rule-card"><h3><span class="ic">🧭</span>내 기록</h3><div class="mine"><span>별 ${state.candy}개</span><span>도장 ${dj.board.length}/${BOARD}</span><span>연속 ${sk}일</span><span>다이아몬드 ${ensureForest().dia}개</span><span>숲 ${areaName(state.forest.area)} ${state.forest.lit}/${forestN()}</span><span>도감 ${$('colCount').textContent}</span></div><p style="margin-top:8px">${esc(tradeMsg(tradeInfo()))}</p></div>`;
 }
 $('toRules').onclick=()=>{tone(SND.tap);renderRules();show('rules');};
 $('rulesBack').onclick=()=>{renderHome();show('home');};
@@ -2643,6 +2772,7 @@ function finishPrac(){
   const ss=PR.sess;if(ss.finished)return;ss.finished=true;stopTicker();closeMemoPad();
   const score=ss.kind==='time'?ss.idx-ss.skip:ss.first;
   const total=ss.kind==='time'?ss.idx:ss.target;
+  const tBefore=ss.kind==='free'&&ss.startStep===3?tradePassed():null;
   let note='';
   if(ss.kind==='time'){const k='t'+(ss.dur===60?'t60':'t120')+'_'+ss.lv,b=state.best[k]||0;
     if(score>b){state.best[k]=score;note=b?' · 새 최고 기록!':' · 첫 기록이에요!';}else note=' · 최고 '+b+'문제';
@@ -2657,6 +2787,13 @@ function finishPrac(){
   $('clearStars').innerHTML='';
   $('clearText').textContent=ss.kind==='time'?`${ss.dur===60?'1분':'2분'} 동안 ${score}문제를 맞혔어요${note}`:
     `한 번에 맞힌 문제 ${ss.first}/${ss.target}개`+(ss.kind==='grow'?` · 난이도 ${['쉬움','보통','어려움'][ss.step-1]}`:'');
+  /* v2.15 거래 조건 안내 (자유 연습 '어려움') */
+  if(tBefore){const ti=tradeInfo();let t='';
+    if(ti.done)t='';
+    else if(ss.first<TRADE.min)t=`'어려움'에서 ${TRADE.min}개 이상 맞히면 거래 조건이 채워져!`;
+    else if(tBefore.includes(ss.lv))t='이 주제는 오늘 이미 했어. 다른 주제를 골라 봐!';
+    else t='거래 조건 달성! '+(ti.ready?'이제 거래할 수 있어!':tradeMsg(ti));
+    if(t)$('clearText').textContent+='\n'+t;}
   $('clearOk').textContent='한 번 더';$('clearOk').dataset.next='again';
   $('clearMap').textContent='연습 메뉴로';$('clearMap').hidden=false;
   $('clearBox').hidden=false;$('clearOk').focus();
@@ -3012,6 +3149,8 @@ function holdEnd(){clearTimeout(holdT);pb.classList.remove('holding');}
 pb.addEventListener('pointerdown',holdStart);
 ['pointerup','pointerleave','pointercancel'].forEach(ev=>pb.addEventListener(ev,holdEnd));
 pb.addEventListener('contextmenu',e=>e.preventDefault());
+/* v2.15 앱 전체: 길게 누르기 메뉴(이미지 저장·복사 등)를 막음. 글자 입력 칸은 그대로 */
+document.addEventListener('contextmenu',e=>{if(!(e.target.closest&&e.target.closest('input,textarea,select')))e.preventDefault();});
 pb.addEventListener('click',e=>{if(e.detail===0)openParent();else if($('parent').hidden)toast('엄마 설정은 꾹 눌러야 열려요');});
 /* 엄마 확인: 4자리 비밀번호 (처음 0000). 잊었을 때는 어른용 계산 문제로 0000 초기화 */
 let pinBuf='',gateAns=0;
@@ -3301,7 +3440,7 @@ function renderReport(){
   // 연습
   const PH=state.pracHist.slice(-5).reverse(),KN={free:'자유 연습',grow:'실력 쑥쑥',time:'시간 도전'};
   const bests=Object.keys(state.best).filter(k=>/^tt(60|120)_/.test(k)).map(k=>{const m=k.match(/^tt(60|120)_(.+)$/);return `${m[1]==='60'?'1분':'2분'} · ${m[2]==='mix'?'골고루 섞기':C.LEVELS[+m[2]].name} ${state.best[k]}문제`;});
-  $('repPrac').innerHTML=(PH.length?`<ul class="plain">${PH.map(h=>`<li>${h.date.slice(5).replace('-','/')} ${KN[h.kind]} · ${h.lv==='mix'?'골고루 섞기':esc(C.LEVELS[h.lv].name)} · ${h.kind==='time'?h.score+'문제':h.first+'/'+h.total}</li>`).join('')}</ul>`:'<p class="note">아직 연습 기록이 없어요.</p>')+(bests.length?`<p class="note">시간 도전 최고 기록: ${bests.map(esc).join(' / ')}</p>`:'');
+  $('repPrac').innerHTML=(PH.length?`<ul class="plain">${PH.map(h=>`<li>${h.date.slice(5).replace('-','/')} ${KN[h.kind]} · ${h.lv==='mix'?'골고루 섞기':esc(C.LEVELS[h.lv].name)} · ${h.kind==='time'?h.score+'문제':h.first+'/'+h.total}</li>`).join('')}</ul>`:'<p class="note">아직 연습 기록이 없어요.</p>')+(bests.length?`<p class="note">시간 도전 최고 기록: ${bests.map(esc).join(' / ')}</p>`:'')+tradeReportHTML();
   // 엄마 한마디
   renderMsgList();
 }
