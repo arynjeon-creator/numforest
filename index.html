@@ -934,6 +934,13 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
         <button class="btn warn" id="tClear" type="button">도감 비우기</button>
         <button class="btn warn" id="tAll" type="button">모든 기록 지우기</button>
       </div>
+      <h3 style="margin:6px 0 0;font-family:var(--font-display);font-weight:400">만난 친구 바꾸기</h3>
+      <p>아이가 이미 만난 친구 하나를 아직 못 만난 친구로 바꿔요. 짝꿍·꾸미기·만난 곳도 함께 옮겨지고, 별·다이아몬드·숲 진행은 그대로예요.</p>
+      <div class="row"><label for="swFrom">바꿀 친구</label><select class="sel" id="swFrom"></select></div>
+      <div class="row"><label for="swTo">새 친구</label><select class="sel" id="swTo"></select></div>
+      <div class="tools">
+        <button class="btn warn" id="swGo" type="button">바꾸기</button>
+      </div>
     </details>
     <p class="tag" id="appVer" style="text-align:center;margin:8px 0 0"></p>
   </section>
@@ -1804,8 +1811,8 @@ function save(){
    웹앱 버전(BUILD='web')에서만 동작. 테스트판(claude 링크)과 공개 출시판에서는 꺼짐.
    가족 코드는 이 기기에만 저장되고, 서버에는 코드의 해시(암호화된 지문)만 저장됨. */
 const BUILD='web';
-const APP_VER='2.16 · 2026-10-23';
-const APP_BUILD='b481027639';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
+const APP_VER='2.17 · 2026-10-25';
+const APP_BUILD='b7fb2bf031';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
 const SYNC_DEFAULT={"url": "https://mupsdurscfkbuptmsxtr.supabase.co", "key": "sb_publishable_3Wa_MeVRfkQI0JEysg2PZA_F6PfrZQ8"};
 const SKEY='numforest-sync';
 const SYNC={
@@ -1919,6 +1926,11 @@ function pool(){
   if(state.set.pool==='custom'&&chars.length)return chars.slice();
   if(state.set.pool==='default'||!chars.length)return basePool().slice();
   return chars.concat(basePool());
+}
+/* v2.17 도감 목록: 지금 설정의 친구 + 설정 밖이라도 이미 만난 친구. 순서는 앱 친구 → 엄마 친구 */
+function colList(){
+  const P=pool(),inP=id=>P.some(c=>c.id===id),own=id=>state.col.includes(id);
+  return basePool().filter(c=>inP(c.id)||own(c.id)).concat(chars.filter(c=>inP(c.id)||own(c.id)));
 }
 function findChar(id){if(id==='guide')return GUIDE;return chars.find(c=>c.id===id)||BUILTIN.find(c=>c.id===id)||DEFAULTS.find(c=>c.id===id)||(id==='gold'?GOLD:null);}
 function partner(){const p=state.partner&&state.col.includes(state.partner)?findChar(state.partner):null;return p||GUIDE;}
@@ -2126,8 +2138,8 @@ function renderHome(){
   if(state.cele){delete state.cele;}
   const t=T(),s=state.set,L=C.LEVELS[s.cur];
   $('candyChip').innerHTML=CANDY_IC+' '+state.candy;
-  const P=pool(),own=state.col.filter(id=>P.some(c=>c.id===id)||(id==='gold'&&useGold())).length;
-  $('colCount').textContent=own+'/'+(P.length+(useGold()?1:0));
+  const CL=colList(),own=state.col.filter(id=>CL.some(c=>c.id===id)||(id==='gold'&&useGold())).length;
+  $('colCount').textContent=own+'/'+(CL.length+(useGold()?1:0));
   const tl=t.lv||s.cur,ts=t.step||s.step,TL=C.LEVELS[tl];
   $('lvTag').textContent='';$('lvTag').hidden=true;  /* v2.2: 레벨 이름은 엄마 화면에만 */
   const dc=doneCount(),tc=totalCount();
@@ -3070,7 +3082,7 @@ $('rewardDeco').onclick=()=>{openDeco();};
 /* ---------- 도감 ---------- */
 function renderCollection(){
   ensureForest();
-  const P2=pool(),cur=partner().id;
+  const P2=colList(),cur=partner().id;
   const list=[GUIDE].concat(P2,useGold()?[GOLD]:[]);
   /* 다른 기기에서 넣은 엄마 친구: 그림이 아직 안 왔으면 "그림 받는 중" */
   state.col.filter(id=>!findChar(id)).forEach(id=>list.push({id,name:'그림 받는 중',color:'#EDE6D6',dark:'#C9BFA8',belly:'#FAF6EC',acc:'',shape:'round',wait:true}));
@@ -3220,6 +3232,7 @@ $('pinSave').onclick=()=>{
 };
 
 function renderParent(){
+  try{renderSwap();}catch(e){}
   {const f=ensureForest(),hc=f.hid&&findChar(f.hid);$('forestNSel').value=String(forestN());
    $('forestInfo').textContent=`다이아몬드 모두 ${f.dia}개 · 지금 구역 ${areaName(f.area)} ${f.lit}/${forestN()} · 숲에서 찾은 친구 ${f.done.filter(x=>x.id!=='chest').length}마리 · 지금 숨은 친구 ${hc?hc.name:'없음 (보물상자)'}`;}
   $('appVer').textContent='숫자숲 탐험대 버전 '+APP_VER+(BUILD==='web'?'':' (테스트판)');
@@ -3543,6 +3556,29 @@ $('tUp').onclick=()=>{const s=state.set,td=todayStr();state.hist=state.hist.filt
   for(let k=3;k>=1;k--)state.hist.push({date:addDays(td,-k),lv:s.cur,step:s.step,total:40,first:38,sec:1500,stars:[3,3,3,3,3],firsts:['8/8','8/8','8/8','8/8','8/8'],avg:3,mist:{}});
   state.hist.sort((a,b)=>a.date<b.date?-1:1);state.pendingUp=false;checkLevelUp();save();
   toast(s.auto==='off'?'자동 올리기가 꺼져 있어요':s.step>=3&&!cardsDone(s.cur)?'3단계는 다르게 풀기 카드를 모두 통과해야 올라가요':state.pendingUp?'레벨 올리기 알림이 생겼어요':s.auto==='auto'?'자동으로 올렸어요':isDaji()?'학기 마지막 레벨 졸업: 다지기 모드':'올릴 다음 단계가 없어요');renderParent();};
+/* v2.17 만난 친구 바꾸기 (엄마 도구) */
+function swLabel(c){return esc(c.name)+(chars.some(x=>x.id===c.id)?' (엄마 친구)':' (앱 친구)');}
+function renderSwap(){
+  const from=state.col.map(findChar).filter(c=>c&&c.id!=='gold'&&c.id!=='guide');
+  const to=chars.concat(basePool()).filter(c=>!state.col.includes(c.id));
+  $('swFrom').innerHTML=from.length?from.map(c=>`<option value="${c.id}">${swLabel(c)}</option>`).join(''):'<option value="">만난 친구가 없어요</option>';
+  $('swTo').innerHTML=to.length?to.map(c=>`<option value="${c.id}">${swLabel(c)}</option>`).join(''):'<option value="">못 만난 친구가 없어요</option>';
+  $('swGo').disabled=!from.length||!to.length;
+}
+function swapFriend(a,b){
+  if(!a||!b||a===b||!state.col.includes(a)||state.col.includes(b)||!findChar(b))return false;
+  state.col=state.col.map(x=>x===a?b:x);
+  if(state.partner===a)state.partner=b;
+  if(state.wear[a]){state.wear[b]=state.wear[a];delete state.wear[a];}
+  if(state.adj[a]){state.adj[b]=state.adj[a];delete state.adj[a];}
+  if(state.met&&state.met[a]){state.met[b]=state.met[a];delete state.met[a];}
+  const f=state.forest;if(f&&Array.isArray(f.done))f.done.forEach(r=>{if(r.id===a)r.id=b;});
+  save();ensureForest();return true;
+}
+$('swGo').onclick=e=>armBtn(e.currentTarget,()=>{
+  const a=$('swFrom').value,b=$('swTo').value,A=findChar(a),B=findChar(b);
+  if(swapFriend(a,b)){toast(`${A?A.name:'친구'} → ${josa(B.name,'으로')} 바꿨어요`);renderParent();}else toast('바꿀 수 없어요. 다시 골라 주세요');
+},'한 번 더 누르면 바꿔요');
 $('tClear').onclick=e=>armBtn(e.currentTarget,()=>{state.col=[];state.partner=null;save();toast('도감을 비웠어요');renderParent();});
 $('tAll').onclick=e=>armBtn(e.currentTarget,()=>{state=defaults();state.dojang.init=true;state.mig2=true;save();newToday();toast('모든 기록을 지웠어요');renderParent();});
 
