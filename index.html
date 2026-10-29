@@ -1950,8 +1950,8 @@ function save(){
    웹앱 버전(BUILD='web')에서만 동작. 테스트판(claude 링크)과 공개 출시판에서는 꺼짐.
    가족 코드는 이 기기에만 저장되고, 서버에는 코드의 해시(암호화된 지문)만 저장됨. */
 const BUILD='web';
-const APP_VER='2.18 · 2026-10-29';
-const APP_BUILD='1494e9c36c';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
+const APP_VER='2.18.1 · 2026-10-29';
+const APP_BUILD='7a0c19305d';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
 const SYNC_DEFAULT={"url": "https://mupsdurscfkbuptmsxtr.supabase.co", "key": "sb_publishable_3Wa_MeVRfkQI0JEysg2PZA_F6PfrZQ8"};
 const SKEY='numforest-sync';
 const SYNC={
@@ -2718,8 +2718,10 @@ function circSVG(p){
   const wrap=(w,h,body)=>`<svg viewBox="0 0 ${w} ${h}" style="aspect-ratio:${w}/${h}" aria-hidden="true">${body}</svg>`;
   const cm=v=>v+' cm';
   switch(p.k){
-    case 'r2d':case 'cmp':case 'long':{const x=90,y=66,r=56;return wrap(180,160,C0(x,y,r)+Ln(x,y,x+r,y,RL)+T(x+r/2,y-8,cm(p.r),RL)+Ln(x-r*.9,y+26,x+r*.9,y+26,Q,1)+T(x,y+r+24,p.k==='long'?'가장 긴 선분 ?':'지름 ?',Q,15));}
-    case 'd2r':case 'cmpD':{const x=90,y=72,r=56;return wrap(180,150,C0(x,y,r)+Ln(x-r,y,x+r,y,RL)+T(x,y+20,cm(p.D),RL)+Ln(x,y,x+r*.7,y-r*.7,Q,1)+T(x+r*.55,y-r*.75,'?',Q,16));}
+    case 'r2d':case 'cmp':case 'long':{const x=90,y=66,r=56,ux=x+r*.707,uy=y-r*.707;
+      /* 지름(점선)은 중심을 지나는 가로선, 반지름(빨간 선)은 중심에서 오른쪽 위로 */
+      return wrap(180,160,C0(x,y,r)+Ln(x-r,y,x+r,y,Q,1)+Ln(x,y,ux,uy,RL)+T(x+r*.62,y-r*.28,cm(p.r),RL,14)+T(x,y+r+24,p.k==='long'?'가장 긴 선분 ?':'지름 ?',Q,15)+T(x-r/2,y+16,'?',Q,15));}
+    case 'd2r':case 'cmpD':{const x=90,y=72,r=56;return wrap(180,150,C0(x,y,r)+Ln(x-r,y,x+r,y,RL)+T(x,y+20,cm(p.D),RL)+Ln(x,y,x+r*.7,y-r*.7,Q,1)+T(x+r*.22,y-r*.42,'?',Q,16));}
     case 'row':case 'rect':case 'ctr':case 'rev':{const n=p.n,r=n>4?24:28,w=2*r*n+40,y=r+30;let b='';
       if(p.k==='rect')b+=`<rect x="20" y="${y-r}" width="${2*r*n}" height="${2*r}" fill="none" stroke="${Q}" stroke-width="2.5"/>`;
       for(let i=0;i<n;i++)b+=C0(20+r+2*r*i,y,r);
