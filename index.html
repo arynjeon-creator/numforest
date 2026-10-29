@@ -481,6 +481,22 @@ textarea.textin{resize:vertical;font-family:var(--font-body)}
 .vert .ans.badc{border-color:var(--coral)}
 .pwrap .note{text-align:center}
 .circfig{display:flex;justify-content:center;max-width:100%}
+/* v2.19 분수: 위 분자, 가로줄, 아래 분모 */
+.frc{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.08;font-size:.82em;margin:0 .12em;font-variant-numeric:tabular-nums}
+.frc>span:first-child{border-bottom:.09em solid currentColor;padding:0 .18em}
+.mx{display:inline-flex;align-items:center;gap:.08em;vertical-align:middle}
+.fst{display:inline-flex;flex-direction:column;align-items:center;gap:.08em;vertical-align:middle}
+.fst .fbar{display:block;width:100%;min-width:1.9em;height:.09em;background:var(--ink);border-radius:2px}
+.fst .fd{line-height:1.2}
+.fst .fbox{font-size:.82em}
+.fq{font-family:var(--font-display);font-size:clamp(24px,4vw,40px);display:flex;align-items:center;gap:.3em;flex-wrap:wrap;justify-content:center;text-align:center}
+.fq .txt{font-size:.8em;color:var(--ink)}
+.fq .txt .frc,.story .frc{font-size:1em}
+.fstory{font-size:calc(21px * var(--fs))!important}
+@media (max-width:600px){.circfig svg{height:clamp(84px,16vh,140px)}}
+.fchoices{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.fchoices .choice{font-size:clamp(26px,4.2vw,40px);min-width:2.6em;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:.2em}
+.fstory{font-size:calc(19px * var(--fs))}
 .circfig svg{height:clamp(130px,26vh,210px);width:auto;max-width:100%}
 .pwrap .note,.pwrap .story{background:rgba(255,253,246,.88);border-radius:12px;padding:2px 10px}
 .cbox{background:rgba(255,253,246,.78);border-radius:16px;padding:6px 12px}
@@ -1059,22 +1075,22 @@ const WORLDS=[{name:'새싹 들판',grade:'2학년 복습'},{name:'숫자숲',gr
 const LV=[null,
  [0,'구구단','2학년'],[0,'두 자리 덧셈·뺄셈','2학년'],
  [1,'세 자리 덧셈 1','3-1'],[1,'세 자리 덧셈 2','3-1'],[1,'세 자리 뺄셈','3-1'],[1,'나눗셈 첫걸음','3-1'],[1,'두 자리 × 한 자리','3-1'],[1,'시간 계산','3-1'],
- [1,'세 자리 × 한 자리','3-2'],[1,'두 자리 × 두 자리','3-2'],[1,'두·세 자리 ÷ 한 자리','3-2'],[1,'들이·무게 계산','3-2'],[1,'원','3-2'],
+ [1,'세 자리 × 한 자리','3-2'],[1,'두 자리 × 두 자리','3-2'],[1,'두·세 자리 ÷ 한 자리','3-2'],[1,'들이·무게 계산','3-2'],[1,'원','3-2'],[1,'분수','3-2'],
  [2,'큰 수','4-1'],[2,'세 자리 × 두 자리','4-1'],[2,'두 자리로 나누기','4-1'],[2,'어림셈','4-1'],[2,'같은 분모 분수 덧셈·뺄셈','4-2'],[2,'소수 덧셈·뺄셈','4-2'],
  [3,'혼합 계산','5-1'],[3,'최대공약수·최소공배수','5-1'],[3,'약분·통분','5-1'],[3,'분모 다른 분수 덧셈·뺄셈','5-1'],[3,'올림·버림·반올림','5-2'],[3,'분수의 곱셈','5-2'],[3,'소수의 곱셈','5-2'],
  [4,'몫을 분수로','6-1'],[4,'소수 ÷ 자연수','6-1'],[4,'비와 비율','6-1'],[4,'분수 ÷ 분수','6-2'],[4,'소수 ÷ 소수','6-2'],[4,'비례식·비례배분','6-2']
 ].map((x,i)=>x&&{lv:i,w:x[0],name:x[1],sem:x[2]});
-const READY=13;
+const READY=14;
 /* v2.18 배우는 순서: 레벨 번호와 따로. 원(13)은 나눗셈(11) 다음, 들이·무게(12) 앞 (교과서 3학년 2학기 순서) */
-const ORDER=[1,2,3,4,5,6,7,8,9,10,11,13,12];
+const ORDER=[1,2,3,4,5,6,7,8,9,10,11,13,14,12];
 const rank=l=>{const i=ORDER.indexOf(l);return i<0?100+l:i;};
-const STEPS={1:['2~5단','6~9단','2~9단 섞기'],2:['받아올림·내림 없음','받아올림·내림 1번','합이 100 넘는 것 포함'],3:['받아올림 없음','일의 자리 받아올림','십의 자리 받아올림'],4:['받아올림 2번','합이 네 자리','받아올림 3번'],5:['받아내림 1번','받아내림 2번','십의 자리가 0인 수'],6:['2~5로 나누기','6~9로 나누기','섞기'],7:['올림 없음','올림 1번','올림 2번'],8:['분·초 더하기','시간·분 더하기','시간 빼기'],9:['올림 0~1번','올림 2번','올림 3번'],10:['몇십 × 몇십','몇십몇 × 몇십','몇십몇 × 몇십몇'],11:['나누어떨어지는 나눗셈','나머지 있는 나눗셈','세 자리 ÷ 한 자리'],12:['L·mL 더하기','L·mL 빼기','kg·g 섞기'],13:['지름과 반지름','이어 그린 원','여러 가지 원 문제']};
+const STEPS={1:['2~5단','6~9단','2~9단 섞기'],2:['받아올림·내림 없음','받아올림·내림 1번','합이 100 넘는 것 포함'],3:['받아올림 없음','일의 자리 받아올림','십의 자리 받아올림'],4:['받아올림 2번','합이 네 자리','받아올림 3번'],5:['받아내림 1번','받아내림 2번','십의 자리가 0인 수'],6:['2~5로 나누기','6~9로 나누기','섞기'],7:['올림 없음','올림 1번','올림 2번'],8:['분·초 더하기','시간·분 더하기','시간 빼기'],9:['올림 0~1번','올림 2번','올림 3번'],10:['몇십 × 몇십','몇십몇 × 몇십','몇십몇 × 몇십몇'],11:['나누어떨어지는 나눗셈','나머지 있는 나눗셈','세 자리 ÷ 한 자리'],12:['L·mL 더하기','L·mL 빼기','kg·g 섞기'],13:['지름과 반지름','이어 그린 원','여러 가지 원 문제'],14:['분수로 나타내기·분수만큼','길이와 시간의 분수만큼','가분수·대분수·크기 비교']};
 const QUICK={'g2':{cur:1,step:1,review:[],sem:'2학년'},'3-1':{cur:3,step:1,review:[1,2],sem:'3-1'},'3-2':{cur:9,step:1,review:[1,3,4,5,6,7,8],sem:'3-2'}};
 /* 학기 순서: 학기 잠금(설계서 v2.1 4-3)에 씀 */
 const SEMS=['2학년','3-1','3-2','4-1','4-2','5-1','5-2','6-1','6-2'];
 const semIdx=x=>SEMS.indexOf(x);
-const PRIMARY={1:'horiz',2:'vert',3:'vert',4:'vert',5:'vert',6:'horiz',7:'vert',8:'unit',9:'vert',10:'vert',11:'qr',12:'unit',13:'circ'};
-const ALT={1:'flash',2:'horiz',3:'horiz',4:'horiz',5:'horiz',6:'candy',7:'split',8:'ustory',9:'split',10:'split',11:'candy',12:'cup',13:'circapp'};
+const PRIMARY={1:'horiz',2:'vert',3:'vert',4:'vert',5:'vert',6:'horiz',7:'vert',8:'unit',9:'vert',10:'vert',11:'qr',12:'unit',13:'circ',14:'frac'};
+const ALT={1:'flash',2:'horiz',3:'horiz',4:'horiz',5:'horiz',6:'candy',7:'split',8:'ustory',9:'split',10:'split',11:'candy',12:'cup',13:'circapp',14:'fracapp'};
 
 function tryGen(lv,s){
  let a,b;
@@ -1122,6 +1138,7 @@ function tryGen(lv,s){
   if(s===1||(s===3&&R()<.5)){const A=[rnd(1,5),m()],B=[rnd(1,4),m()];if(A[1]+B[1]<1000)return null;return {op:'+',u,base:1000,A,B};}
   const A=[rnd(3,9),m()],B=[rnd(1,A[0]-1),m()];if(B[1]<=A[1])return null;return {op:'-',u,base:1000,A,B};}
  case 13:return circBasic(s);
+ case 14:return fracBasic(s);
  }
  return null;
 }
@@ -1172,6 +1189,151 @@ function circCheck(p,a){
  return false;
 }
 function sumNN(x,n){let t=0;for(let i=0;i<n;i++)t+=x;return t;}
+/* ===== Lv14 분수 (v2.19) =====
+   답 모양(fracLayout): nat 자연수 / fr2 □/□ (칸 순서: 분모 → 분자) / frN 분모가 정해진 분수(분자만) /
+   mixW 대분수(자연수, 분자; 분모 정해짐) / mix3 대분수(자연수, 분모, 분자) / ch 고르기
+   문장 속 분수 표시: ⟦n/d⟧, 대분수 ⟦w n/d⟧ → 화면에서는 위아래 분수, 글자로는 n/d */
+const FR_APP={1:['ofM','ofS'],2:['whole','some','chain','mcm'],3:['cmpMI','least','card','picM']};
+const FR_LAYOUT={pic:'fr2',grp:'fr2',ofU:'nat',ofS:'nat',ofM:'nat',len:'nat',m2cm:'nat',time:'nat',sec:'nat',whole:'nat',some:'nat',chain:'nat',mcm:'nat',m2i:'frN',i2m:'mixW',kind:'ch',cmpS:'ch',cmpU:'ch',cmpMI:'ch',least:'ch',card:'mix3',picM:'mix3'};
+const FR_UNIT={ofM:'개',len:'cm',m2cm:'cm',time:'분',sec:'초',some:'cm',mcm:'cm'};
+function fracLayout(p){return FR_LAYOUT[p.k];}
+const F=(n,d)=>`⟦${n}/${d}⟧`,M=(w,n,d)=>`⟦${w} ${n}/${d}⟧`;
+/* 분수 뒤 조사: 분자로 읽는 소리에 맞춤 (3/4 → 사분의 삼 → 삼은) */
+const jp=(n,t)=>josa(n,t).slice(String(n).length),Fj=(n,d,t)=>F(n,d)+jp(n,t),Mj=(w,n,d,t)=>M(w,n,d)+jp(n,t);
+const fv=o=>o.w?o.w*o.d+o.n:o.n;   /* 같은 분모로 바꾼 분자 (크기 비교용) */
+const fs=o=>o.w?M(o.w,o.n,o.d):F(o.n,o.d);
+function fracMake(k){
+ switch(k){
+  case 'pic':{const sh=pick(['pie','pie','hex','bar']),d=sh==='hex'?6:sh==='bar'?rnd(3,10):rnd(3,8),m=rnd(1,d-1);return {k,sh,d,m,ask:R()<.7?'on':'off'};}
+  case 'grp':{const g=rnd(2,6),G=rnd(3,6),j=rnd(1,G-1);if(g*G>36)return null;return {k,N:g*G,g,x:g*j};}
+  case 'ofU':{const d=rnd(2,9);return {k,a:d*rnd(2,9),d};}
+  case 'ofS':case 'ofM':{const d=rnd(3,9),m=rnd(2,d-1);return {k,a:d*rnd(2,9),d,m};}
+  case 'len':{const d=rnd(2,9),q=rnd(2,11);if(d*q>99)return null;return {k,L:d*q,d,m:rnd(1,d-1)};}
+  case 'm2cm':{const d=pick([2,4,5,10,20,25]);return {k,d,m:rnd(1,d-1)};}
+  case 'time':{const d=pick([2,3,4,5,6,10,12]);return {k,d,m:rnd(1,d-1)};}
+  case 'sec':{const d=rnd(2,9),q=rnd(2,9);if(d*q>60)return null;return {k,S:d*q,d,m:rnd(1,d-1)};}
+  case 'whole':case 'some':{const d=rnd(3,12),m=rnd(2,d-1),q=rnd(2,9);return {k,d,m,x:m*q,obj:pick(['철사','리본','끈'])};}
+  case 'chain':{const d1=rnd(3,10),m1=rnd(2,d1-1),d2=rnd(2,10),m2=rnd(1,d2-1);let l=d1;while(l%d2)l+=d1;const W=l*rnd(1,4);
+    if(W>120||d1===d2)return null;return {k,d1,m1,x:W/d1*m1,d2,m2};}
+  case 'mcm':{const d=pick([2,3,4,5,6,7,8,9]),c=rnd(1,99);if((100+c)%d)return null;return {k,c,d,m:rnd(1,d-1)};}
+  case 'm2i':{const d=rnd(2,9);return {k,w:rnd(1,9),n:rnd(1,d-1),d};}
+  case 'i2m':{const d=rnd(2,9),N=rnd(d+1,9*d+d-1);if(N%d===0)return null;return {k,N,d};}
+  case 'kind':{const d=rnd(3,9),ask=pick(['진분수','가분수','대분수']);
+    const mk=t=>t==='진분수'?{n:rnd(1,d-1),d}:t==='가분수'?{n:rnd(d,d*3),d}:{w:rnd(1,5),n:rnd(1,d-1),d};
+    const others=['진분수','가분수','대분수'].filter(t=>t!==ask),ops=[mk(ask),mk(others[0]),mk(others[1])];
+    for(let i=ops.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[ops[i],ops[j]]=[ops[j],ops[i]];}
+    return {k,ask,opts:ops};}
+  case 'cmpS':{const d=rnd(3,12),a=rnd(1,d*2),b=R()<.12?a:rnd(1,d*2);return {k,d,a,b};}
+  case 'cmpU':{const a=rnd(2,12);let b=rnd(2,12);if(b===a)return null;return {k,a,b};}
+  case 'cmpMI':{const d=rnd(2,9),w=rnd(1,8),n=rnd(1,d-1),N=w*d+n+pick([-2,-1,0,1,2]);if(N<=d||N%d===0)return null;return {k,w,n,d,N};}
+  case 'least':{const d=rnd(3,9),ask=R()<.5?'small':'big',ops=[];const used=new Set();
+    while(ops.length<3){const big=R()<.5,o=big?{w:rnd(1,3),n:rnd(1,d-1),d}:{n:rnd(1,4*d-1),d};const v=fv(o);if(o.n===0||used.has(v))continue;used.add(v);ops.push(o);}
+    return {k,d,ask,opts:ops};}
+  case 'card':{const s=new Set();while(s.size<3)s.add(rnd(2,9));return {k,ds:[...s]};}
+  case 'picM':{const d=pick([3,4,5,6,8]);return {k,w:rnd(1,3),n:rnd(1,d-1),d};}
+ }
+ return null;
+}
+function fracBasic(s){const k=s===1?pick(['pic','pic','grp','ofU']):s===2?pick(['len','m2cm','time','sec']):pick(['m2i','i2m','kind','cmpS','cmpU']);const o=fracMake(k);return o?Object.assign({op:'frac'},o):null;}
+function fracAns(p){
+ switch(p.k){
+  case 'pic':return [p.d,p.ask==='on'?p.m:p.d-p.m];
+  case 'grp':return [p.N/p.g,p.x/p.g];
+  case 'ofU':return [p.a/p.d];
+  case 'ofS':case 'ofM':return [p.a/p.d*p.m];
+  case 'len':return [p.L/p.d*p.m];
+  case 'm2cm':return [100/p.d*p.m];
+  case 'time':return [60/p.d*p.m];
+  case 'sec':return [p.S/p.d*p.m];
+  case 'whole':case 'some':return [p.x/p.m*p.d];
+  case 'chain':{const W=p.x/p.m1*p.d1;return [W/p.d2*p.m2];}
+  case 'mcm':return [(100+p.c)/p.d*p.m];
+  case 'm2i':return [p.w*p.d+p.n];
+  case 'i2m':return [Math.floor(p.N/p.d),p.N%p.d];
+  case 'kind':{const t=o=>o.w?'대분수':o.n<o.d?'진분수':'가분수';return [p.opts.findIndex(o=>t(o)===p.ask)];}
+  case 'cmpS':return [cmpCode(p.a,p.b)];
+  case 'cmpU':return [cmpCode(p.b,p.a)];
+  case 'cmpMI':return [cmpCode(p.w*p.d+p.n,p.N)];
+  case 'least':{const v=p.opts.map(fv),t=p.ask==='small'?Math.min(...v):Math.max(...v);return [v.indexOf(t)];}
+  case 'card':{const s=p.ds.slice().sort((a,b)=>a-b);return [s[2],s[1],s[0]];}
+  case 'picM':return [p.w,p.d,p.n];
+ }
+ throw new Error('모르는 분수 문제');
+}
+/* 검산: 다른 방법으로 다시 확인 (곱셈으로 되돌리기·더해서 세기) */
+function fracCheck(p,a){
+ switch(p.k){
+  case 'pic':return a[0]===p.d&&a[1]<p.d&&(p.ask==='on'?a[1]:p.d-a[1])===p.m;
+  case 'grp':return sumNN(p.g,a[0])===p.N&&sumNN(p.g,a[1])===p.x;
+  case 'ofU':return sumNN(a[0],p.d)===p.a;
+  case 'ofS':case 'ofM':return a[0]*p.d===p.a*p.m;
+  case 'len':return a[0]*p.d===p.L*p.m;
+  case 'm2cm':return a[0]*p.d===100*p.m;
+  case 'time':return a[0]*p.d===60*p.m;
+  case 'sec':return a[0]*p.d===p.S*p.m;
+  case 'whole':case 'some':return a[0]*p.m===p.x*p.d;
+  case 'chain':{const W=p.x*p.d1/p.m1;return Number.isInteger(W)&&a[0]*p.d2===W*p.m2;}
+  case 'mcm':return a[0]*p.d===(100+p.c)*p.m;
+  case 'm2i':return a[0]-p.n===sumNN(p.w,p.d);
+  case 'i2m':return sumNN(p.d,a[0])+a[1]===p.N&&a[1]<p.d&&a[1]>0;
+  case 'kind':{const o=p.opts[a[0]];if(!o)return false;const ok=p.ask==='대분수'?!!o.w:p.ask==='진분수'?(!o.w&&o.n<o.d):(!o.w&&o.n>=o.d);return ok&&p.opts.filter(x=>p.ask==='대분수'?!!x.w:p.ask==='진분수'?(!x.w&&x.n<x.d):(!x.w&&x.n>=x.d)).length===1;}
+  case 'cmpS':return a[0]===(p.a<p.b?0:p.a===p.b?1:2);
+  case 'cmpU':return a[0]===(p.a>p.b?0:2);
+  case 'cmpMI':{const l=p.w*p.d+p.n;return a[0]===(l<p.N?0:l===p.N?1:2);}
+  case 'least':{const v=p.opts.map(fv),x=v[a[0]];return x!==undefined&&v.every(y=>p.ask==='small'?x<=y:x>=y);}
+  case 'card':{const [w,d,n]=a;const rest=p.ds.filter(x=>x!==w);return p.ds.every(x=>x<=w)&&rest.includes(d)&&rest.includes(n)&&n<d;}
+  case 'picM':return a[0]===p.w&&a[1]===p.d&&a[2]===p.n;
+ }
+ return false;
+}
+/* 문제 문장 (story: 위 문장, pre/suf: 답 칸 앞뒤, opts: 고르기 보기) */
+function fracQ(p){
+ const u=FR_UNIT[p.k]||'';
+ switch(p.k){
+  case 'pic':return {story:`${p.ask==='on'?'색칠한':'색칠하지 않은'} 부분은 전체의 얼마인지 분수로 나타내세요.`,pre:'',suf:''};
+  case 'grp':return {story:`${p.N}개를 ${p.g}개씩 묶었어요.`,pre:`${josa(p.N,'을를')} ${p.g}씩 묶으면 ${josa(p.x,'은는')} ${p.N}의`,suf:'입니다.'};
+  case 'ofU':return {story:'',pre:`${p.a}의 ${Fj(1,p.d,'은는')}`,suf:'입니다.'};
+  case 'ofS':return {story:'',pre:`${p.a}의 ${Fj(p.m,p.d,'은는')}`,suf:'입니다.'};
+  case 'ofM':return {story:`사탕 ${p.a}개의 ${Fj(p.m,p.d,'을를')} 먹었어요. 먹은 사탕은 몇 개일까요?`,pre:'',suf:''};
+  case 'len':return {story:'',pre:`${p.L} cm의 ${Fj(p.m,p.d,'은는')}`,suf:''};
+  case 'm2cm':return {story:'1 m = 100 cm예요.',pre:`1 m의 ${Fj(p.m,p.d,'은는')}`,suf:''};
+  case 'time':return {story:'1시간 = 60분이에요.',pre:`1시간의 ${Fj(p.m,p.d,'은는')}`,suf:''};
+  case 'sec':return {story:'',pre:`${p.S}초의 ${Fj(p.m,p.d,'은는')}`,suf:''};
+  case 'whole':return {story:'',pre:`${Fj(p.m,p.d,'이가')} ${p.x}이면 전체는`,suf:'입니다.'};
+  case 'some':return {story:`${p.obj}의 ${Fj(p.m,p.d,'이가')} ${p.x} cm예요. ${p.obj} 전체의 길이는 몇 cm일까요?`,pre:'',suf:''};
+  case 'chain':return {story:`어떤 수의 ${Fj(p.m1,p.d1,'은는')} ${p.x}입니다.`,pre:`어떤 수의 ${Fj(p.m2,p.d2,'은는')}`,suf:'입니다.'};
+  case 'mcm':return {story:'1 m = 100 cm예요.',pre:`1 m ${p.c} cm의 ${Fj(p.m,p.d,'은는')}`,suf:''};
+  case 'm2i':return {story:'대분수를 가분수로 나타내세요.',pre:`${M(p.w,p.n,p.d)} =`,suf:''};
+  case 'i2m':return {story:'가분수를 대분수로 나타내세요.',pre:`${F(p.N,p.d)} =`,suf:''};
+  case 'kind':return {story:`다음 중 ${p.ask}는 어느 것일까요?`,opts:p.opts.map(fs)};
+  case 'cmpS':return {story:'크기를 비교해서 >, =, < 중 알맞은 것을 고르세요.',left:F(p.a,p.d),right:F(p.b,p.d)};
+  case 'cmpU':return {story:'크기를 비교해서 >, =, < 중 알맞은 것을 고르세요.',left:F(1,p.a),right:F(1,p.b)};
+  case 'cmpMI':return {story:'크기를 비교해서 >, =, < 중 알맞은 것을 고르세요.',left:M(p.w,p.n,p.d),right:F(p.N,p.d)};
+  case 'least':return {story:`가장 ${p.ask==='small'?'작은':'큰'} 분수를 고르세요.`,opts:p.opts.map(fs)};
+  case 'card':return {story:`숫자 카드 ${josa(p.ds.join(', '),'을를')} 한 번씩 모두 써서 만들 수 있는 가장 큰 대분수는?`,pre:'',suf:''};
+  case 'picM':return {story:'색칠한 부분을 대분수로 나타내세요.',pre:'',suf:''};
+ }
+ return {story:''};
+}
+const unFr=t=>String(t||'').replace(/⟦([^⟧]+)⟧/g,'$1');
+function fracText(p){const q=fracQ(p),u=FR_UNIT[p.k]||'';
+ if(q.opts)return unFr(q.story)+' '+q.opts.map((o,i)=>(i+1)+'. '+unFr(o)).join('  ');
+ if(q.left)return unFr(q.left)+' ○ '+unFr(q.right);
+ const L=fracLayout(p),box=L==='fr2'?'□/□':L==='frN'?'□/'+p.d:L==='mixW'?'□ □/'+p.d:L==='mix3'?'□ □/□':'□'+(u?' '+u:'');
+ return [unFr(q.story),unFr(q.pre),box,unFr(q.suf)].filter(Boolean).join(' ').trim();}
+/* 답을 글자로 (리포트·방금 쓴 답) */
+function fracFmt(p,a){
+ const L=fracLayout(p),u=FR_UNIT[p.k]||'',q=fracQ(p);
+ switch(L){
+  case 'fr2':return a[1]+'/'+a[0];
+  case 'frN':return a[0]+'/'+p.d;
+  case 'mixW':return a[0]+' '+a[1]+'/'+p.d;
+  case 'mix3':return a[0]+' '+a[2]+'/'+a[1];
+  case 'ch':return q.opts?unFr(q.opts[+a[0]]||'?'):(['<','=','>'][+a[0]]||'?');
+ }
+ return a[0]+(u?(u==='cm'?' ':'')+u:'');
+}
+
 function circText(p){
  switch(p.k){
   case 'r2d':return `반지름이 ${p.r} cm인 원의 지름은 몇 cm일까요?`;
@@ -1194,6 +1356,7 @@ function gen(lv,s){for(let t=0;t<20000;t++){const p=tryGen(lv,s);if(p){p.lv=lv;p
 
 function solve(p){
  if(p.op==='circ')return [circAns(p)];
+ if(p.op==='frac')return fracAns(p);
  if(p.base){const t=(p.A[0]*p.base+p.A[1])+(p.op==='+'?1:-1)*(p.B[0]*p.base+p.B[1]);return [Math.floor(t/p.base),t%p.base];}
  switch(p.op){case '+':return [p.a+p.b];case '-':return [p.a-p.b];case '×':return [p.a*p.b];case '÷':return [p.a/p.b];case '÷r':return [Math.floor(p.a/p.b),p.a%p.b];}
  throw new Error('모르는 문제');
@@ -1202,6 +1365,7 @@ function solve(p){
 function verify(p,ans){
  if(!ans.every(x=>Number.isInteger(x)&&x>=0))return false;
  if(p.op==='circ')return ans.length===1&&ans[0]>0&&circCheck(p,ans[0]);
+ if(p.op==='frac')return fracCheck(p,ans);
  if(p.base){const T=ans[0]*p.base+ans[1],At=p.A[0]*p.base+p.A[1],Bt=p.B[0]*p.base+p.B[1];
   return ans[1]<p.base&&(p.op==='+'?T-Bt===At:T+Bt===At);}
  switch(p.op){
@@ -1239,6 +1403,12 @@ function present(p,game){
   /* 언덕 오르기: 기본 문제를 그 단계의 응용 문제로 바꿈 (이미 응용 문제면 그대로) */
   if(game==='circapp'&&!CIRC_APP[p.step||1].includes(p.k)){['k','r','D','n','L','r1','r2'].forEach(x=>delete p[x]);Object.assign(p,circMake(pick(CIRC_APP[p.step||1])));}
   p.game='circ';p.fields=[{label:'cm'}];return p;}
+ if(p.op==='frac'){
+  if(game==='fracapp'&&!FR_APP[p.step||1].includes(p.k)){Object.keys(p).forEach(x=>{if(!['op','lv','step','redo'].includes(x))delete p[x];});let o=null;for(let t=0;t<200&&!o;t++)o=fracMake(pick(FR_APP[p.step||1]));Object.assign(p,o);}
+  const L=fracLayout(p);p.game='frac';
+  p.fields=L==='fr2'?[{label:'분모'},{label:'분자'}]:L==='frN'?[{label:'분자'}]:L==='mixW'?[{label:'자연수'},{label:'분자'}]:L==='mix3'?[{label:'자연수'},{label:'분모'},{label:'분자'}]:[{label:''}];
+  if(L==='ch')p.choice=true;else delete p.choice;
+  return p;}
  p.game=game;
  if(game==='qrsteps')p.fields=[{label:'몫'},{label:p.b+' × 몫'},{label:'나머지'}];
  else if(game==='split')p.fields=splitParts(p).map(x=>({label:x.label})).concat([{label:totalLabel(p),total:true}]);
@@ -1268,6 +1438,16 @@ function grade(p,inputs){
 function diagnose(p,inputs,res){
  if(p.game==='card')return 'card';
  const v=inputs.map(x=>parseInt(x,10));
+ if(p.op==='frac'){const A=fracAns(p),L=fracLayout(p);
+  if(L==='fr2'&&v[0]===A[1]&&v[1]===A[0])return 'fswap';
+  if(L==='mix3'&&v[1]===A[2]&&v[2]===A[1])return 'fswap';
+  if(['ofS','ofM','len','m2cm','time','sec'].includes(p.k)&&p.m>1){const T=p.k==='m2cm'?100:p.k==='time'?60:p.k==='sec'?p.S:p.k==='len'?p.L:p.a;if(v[0]===T/p.d)return 'funit';if(v[0]*p.m===T*p.d||v[0]===T/p.m*p.d)return 'freverse';}
+  if(p.k==='m2cm'&&v[0]*p.d===p.m)return 'fm';if(p.k==='mcm'&&v[0]*p.d===(1+p.c)*p.m)return 'fm';
+  if(p.k==='time'&&v[0]*p.d===100*p.m)return 'f60';
+  if(['whole','some'].includes(p.k)){if(v[0]===p.x/p.m)return 'fwhole1';if(v[0]*p.d===p.x*p.m)return 'freverse';}
+  if(p.k==='cmpU')return 'funitcmp';
+  if(['m2i','i2m','cmpMI','least'].includes(p.k))return 'fmix';
+  return 'frac';}
  if(p.op==='circ'){const a=circAns(p),x=v[0];
   if(['r2d','cmp','long','d2r','cmpD'].includes(p.k)&&(x*4===a||x===a*4||(x===p.r||x===p.D)))return 'circrd';
   if((p.k==='row'||p.k==='rect')&&x===p.r*p.n)return 'circcount';
@@ -1293,6 +1473,28 @@ function diagnose(p,inputs,res){
 }
 function hint(p,type){
  if(p.game==='card')return CARDS[p.card].hint(p.q);
+ if(p.op==='frac'){
+  switch(type){
+   case 'fswap':return '분모는 전체를 똑같이 나눈 수(아래), 분자는 그중 몇 개인지(위)야. 위아래가 바뀌었나 봐!';
+   case 'funit':return '1/'+(p.d)+'만큼만 구했네! '+p.m+'/'+p.d+'는 1/'+p.d+'이 '+p.m+'개야. '+josa(p.m,'을를')+' 곱해 줘.';
+   case 'freverse':return '먼저 분모로 나눠서 1/'+(p.d||p.d1)+'을 구하고, 그다음 분자를 곱해! 순서가 바뀌었나 봐.';
+   case 'fm':return '1 m는 100 cm야! cm로 바꾼 다음에 계산해 봐.';
+   case 'f60':return '1시간은 100분이 아니라 60분이야!';
+   case 'fwhole1':return '그건 1/'+p.d+'만큼이야. 전체는 '+p.d+'/'+p.d+'! 1/'+p.d+'에 '+josa(p.d,'을를')+' 곱해 봐.';
+   case 'funitcmp':return '단위분수는 분모가 작을수록 커! 피자를 적게 나눌수록 한 조각이 크잖아.';
+   case 'fmix':return '대분수를 가분수로 바꾸면 쉬워! 자연수 1은 '+((p.d||2))+'/'+((p.d||2))+'이야.';
+  }
+  switch(p.k){
+   case 'pic':return '전체가 몇 조각으로 똑같이 나뉘었는지(분모), 그중 몇 조각인지(분자) 세어 봐!';
+   case 'grp':return '전체가 몇 묶음인지가 분모, '+josa(p.x,'이가')+' 몇 묶음인지가 분자야!';
+   case 'ofU':return josa(p.a,'을를')+' 똑같이 '+p.d+'묶음으로 나누면 한 묶음은 몇 개일까? '+p.a+' ÷ '+p.d;
+   case 'kind':return '진분수: 분자 < 분모, 가분수: 분자 ≥ 분모, 대분수: 자연수와 진분수!';
+   case 'cmpS':return '분모가 같으면 분자가 큰 쪽이 더 커!';
+   case 'chain':return '먼저 1/'+p.d1+'을 구하고 어떤 수(전체)를 찾은 다음, 그 수의 '+p.m2+'/'+p.d2+'를 구해 봐!';
+   case 'card':return '대분수를 크게 하려면 자연수 자리에 가장 큰 수! 남은 두 수로 진분수(분자 < 분모)를 만들어.';
+   case 'picM':return '다 색칠된 원은 자연수, 남은 원은 몇 조각 중 몇 조각인지 봐!';
+  }
+  return '분모로 나누면 1/분모만큼, 거기에 분자를 곱하면 분자/분모만큼이야!';}
  if(p.op==='circ'){
   if(type==='circrd')return '지름은 반지름의 2배, 반지름은 지름의 반이야! 무엇을 구하는지 다시 읽어 봐.';
   if(type==='circcount')return '선분 ㄱㄴ에 반지름이 몇 개 들어가는지 세어 봐! 원 하나에 반지름이 2개씩 있어.';
@@ -1334,6 +1536,28 @@ function hint(p,type){
 function fmtQ(u,arr){return (u[0]==='L'||u[0]==='kg')?arr[0]+' '+u[0]+' '+arr[1]+' '+u[1]:arr[0]+u[0]+' '+arr[1]+u[1];}
 function explain(p){
  if(p.game==='card')return explainCard(p);
+ if(p.op==='frac'){const A=fracAns(p),L=[],f=(n,d)=>n+'/'+d;
+  switch(p.k){
+   case 'pic':L.push('전체를 똑같이 '+p.d+'조각으로 나눴어요 → 분모 '+p.d);L.push((p.ask==='on'?'색칠한':'색칠하지 않은')+' 조각은 '+A[1]+'개 → 분자 '+A[1]);break;
+   case 'grp':L.push(josa(p.N,'을를')+' '+p.g+'씩 묶으면 '+A[0]+'묶음 → 분모 '+A[0]);L.push(josa(p.x,'은는')+' '+A[1]+'묶음 → 분자 '+A[1]);break;
+   case 'ofU':L.push(josa(p.a,'을를')+' 똑같이 '+p.d+'묶음으로 나누면 한 묶음은');L.push(p.a+' ÷ '+p.d+' = '+A[0]);break;
+   case 'ofS':case 'ofM':case 'len':case 'm2cm':case 'time':case 'sec':{const T=p.k==='m2cm'?100:p.k==='time'?60:p.k==='sec'?p.S:p.k==='len'?p.L:p.a;
+     if(p.k==='m2cm')L.push('1 m = 100 cm');if(p.k==='time')L.push('1시간 = 60분');
+     L.push(T+'의 '+f(1,p.d)+' = '+T+' ÷ '+p.d+' = '+(T/p.d));if(p.m>1)L.push(f(p.m,p.d)+jp(p.m,'은는')+' '+f(1,p.d)+'이 '+p.m+'개 → '+(T/p.d)+' × '+p.m+' = '+A[0]);break;}
+   case 'mcm':{const T=100+p.c;L.push('1 m '+p.c+' cm = '+T+' cm');L.push(T+' ÷ '+p.d+' = '+(T/p.d));L.push((T/p.d)+' × '+p.m+' = '+A[0]);break;}
+   case 'whole':case 'some':L.push(f(p.m,p.d)+jp(p.m,'이가')+' '+p.x+' → '+f(1,p.d)+jp(1,'은는')+' '+p.x+' ÷ '+p.m+' = '+(p.x/p.m));L.push('전체('+f(p.d,p.d)+')는 '+(p.x/p.m)+' × '+p.d+' = '+A[0]);break;
+   case 'chain':{const u=p.x/p.m1,W=u*p.d1;L.push(f(1,p.d1)+' = '+p.x+' ÷ '+p.m1+' = '+u+', 어떤 수 = '+u+' × '+p.d1+' = '+W);L.push(W+'의 '+f(1,p.d2)+' = '+W+' ÷ '+p.d2+' = '+(W/p.d2)+(p.m2>1?', '+f(p.m2,p.d2)+' = '+(W/p.d2)+' × '+p.m2+' = '+A[0]:''));break;}
+   case 'm2i':L.push('자연수 '+p.w+' = '+f(p.w*p.d,p.d)+' ('+f(1,p.d)+'이 '+(p.w*p.d)+'개)');L.push(f(p.w*p.d,p.d)+jp(p.w*p.d,'과와')+' '+f(p.n,p.d)+'을 합치면 → '+f(A[0],p.d));break;
+   case 'i2m':L.push(p.N+' ÷ '+p.d+' = '+A[0]+' … '+A[1]);L.push('자연수 '+A[0]+', 남은 '+f(A[1],p.d)+' → '+A[0]+' '+f(A[1],p.d));break;
+   case 'kind':L.push('진분수: 분자가 분모보다 작아요 / 가분수: 분자가 분모와 같거나 커요 / 대분수: 자연수와 진분수');L.push(p.ask+': '+unFr(fs(p.opts[A[0]])));break;
+   case 'cmpS':L.push('분모가 같으면 분자를 비교해요: '+p.a+' '+['<','=','>'][A[0]]+' '+p.b);break;
+   case 'cmpU':L.push('단위분수는 분모가 작을수록 커요');L.push(f(1,p.a)+' '+['<','=','>'][A[0]]+' '+f(1,p.b));break;
+   case 'cmpMI':L.push(p.w+' '+f(p.n,p.d)+jp(p.n,'을를')+' 가분수로 바꾸면 '+f(p.w*p.d+p.n,p.d));L.push(f(p.w*p.d+p.n,p.d)+' '+['<','=','>'][A[0]]+' '+f(p.N,p.d));break;
+   case 'least':L.push('모두 가분수로 바꾸면: '+p.opts.map(o=>f(fv(o),p.d)).join(', '));L.push('가장 '+(p.ask==='small'?'작은':'큰')+' 것: '+unFr(fs(p.opts[A[0]])));break;
+   case 'card':L.push('자연수 자리에 가장 큰 수 '+A[0]);L.push('남은 두 수로 진분수(분자 < 분모): '+f(A[2],A[1]));break;
+   case 'picM':L.push('다 색칠된 원 '+p.w+'개 → 자연수 '+p.w);L.push('나머지 원은 '+p.d+'조각 중 '+p.n+'조각 → '+f(p.n,p.d));break;
+  }
+  return {lines:L,answer:'정답: '+fracFmt(p,A)};}
  if(p.op==='circ'){const a=circAns(p),L=[];
   switch(p.k){
    case 'r2d':case 'long':L.push('지름은 반지름의 2배예요');L.push(p.r+' × 2 = '+a);if(p.k==='long')L.push('원 안에서 가장 긴 선분은 지름이에요');break;
@@ -1375,11 +1599,12 @@ function opSym(op){return op==='-'?'−':op==='÷r'?'÷':op;}
 function problemText(p){
  if(p.game==='card')return CARDS[p.card].text(p.q);
  if(p.op==='circ')return circText(p);
+ if(p.op==='frac')return fracText(p);
  if(p.base)return fmtQ(p.u,p.A)+' '+(p.op==='+'?'+':'−')+' '+fmtQ(p.u,p.B);
  if(p.op==='÷r')return p.a+' ÷ '+p.b+' = □ … □';
  return p.a+' '+opSym(p.op)+' '+p.b+' = □';
 }
-function key(p){if(p.game==='card')return 'c|'+p.card+'|'+JSON.stringify(p.q);if(p.op==='circ')return p.lv+'|circ|'+p.k+'|'+[p.r,p.D,p.n,p.L,p.r1,p.r2].join(',');return p.lv+'|'+p.op+'|'+(p.base?p.u[0]+p.A.join(',')+'/'+p.B.join(','):p.a+','+p.b);}
+function key(p){if(p.game==='card')return 'c|'+p.card+'|'+JSON.stringify(p.q);if(p.op==='circ')return p.lv+'|circ|'+p.k+'|'+[p.r,p.D,p.n,p.L,p.r1,p.r2].join(',');if(p.op==='frac'){const o={};Object.keys(p).sort().forEach(x=>{if(!['game','fields','redo','choice','lv','step'].includes(x))o[x]=p[x];});return p.lv+'|frac|'+JSON.stringify(o);}return p.lv+'|'+p.op+'|'+(p.base?p.u[0]+p.A.join(',')+'/'+p.B.join(','):p.a+','+p.b);}
 function starsFor(first,total){if(total<=0)return 3;if(first>=total)return 3;if(first/total>=0.75)return 2;return 1;}
 /* 학기 잠금: 엄마가 정한 학기(다음 학기 미리 하기를 켜면 한 학기 더)까지만 다음 레벨이 열림 */
 function semLimit(set){return set.semLock===false?99:semIdx(set.sem||'3-2')+(set.ahead?1:0);}
@@ -1393,7 +1618,7 @@ function semLevels(set){const lim=semLimit(set),sm=semIdx(set.sem||'3-2');return
 /* 하루 미션 (v2.1): 워밍업 → 기본 계산(세로셈) → 다르게 풀기 카드 → 기본 계산(가로셈) → 복습
    opt.card: 오늘의 카드 id / opt.mix: 지난 카드 섞기 / opt.rev: 복습에 섞을 카드 / opt.daji: 다지기 모드 레벨 목록 */
 const TODAY_KEYS=['today1','today2','today3'],BASIC_KEYS=['today1','today3'];
-function baseOf(p){if(p.game==='card')return {lv:p.lv,step:p.step,game:'card',card:p.card,tpl:p.tpl,q:JSON.parse(JSON.stringify(p.q)),fields:p.fields.map(()=>({label:''}))};const o={lv:p.lv,step:p.step,op:p.op};if(p.op==='circ'){['k','r','D','n','L','r1','r2'].forEach(x=>{if(p[x]!==undefined)o[x]=p[x];});return o;}if(p.base){o.base=p.base;o.u=p.u.slice();o.A=p.A.slice();o.B=p.B.slice();}else{o.a=p.a;o.b=p.b;}return o;}
+function baseOf(p){if(p.game==='card')return {lv:p.lv,step:p.step,game:'card',card:p.card,tpl:p.tpl,q:JSON.parse(JSON.stringify(p.q)),fields:p.fields.map(()=>({label:''}))};const o={lv:p.lv,step:p.step,op:p.op};if(p.op==='circ'){['k','r','D','n','L','r1','r2'].forEach(x=>{if(p[x]!==undefined)o[x]=p[x];});return o;}if(p.op==='frac'){Object.keys(p).forEach(x=>{if(!['game','fields','redo','choice'].includes(x))o[x]=JSON.parse(JSON.stringify(p[x]));});return o;}if(p.base){o.base=p.base;o.u=p.u.slice();o.A=p.A.slice();o.B=p.B.slice();}else{o.a=p.a;o.b=p.b;}return o;}
 function genSpecial(lv,s,pred){for(let t=0;t<6000;t++){const p=tryGen(lv,s);if(p&&pred(p)){p.lv=lv;p.step=s;return p;}}return null;}
 function buildMission(set,mist,redo,opt){
  opt=opt||{};
@@ -1417,7 +1642,7 @@ function buildMission(set,mist,redo,opt){
  if(!warm.length)warm=simple.filter(l=>ok(l)&&rank(l)<rank(cur));
  if(!warm.length)warm=simple.includes(cur)?[cur]:[];
  const warmGame=l=>simple.includes(l)?'flash':PRIMARY[l];
- const g3=l=>l===13?'circapp':set.t3h&&PRIMARY[l]==='vert'?'horiz':PRIMARY[l];
+ const g3=l=>l===13?'circapp':l===14?'fracapp':set.t3h&&PRIMARY[l]==='vert'?'horiz':PRIMARY[l];
  const c=set.counts;
  const arr=(n,f)=>Array.from({length:n},f);
  const daji=opt.daji&&opt.daji.length?opt.daji:null;
@@ -1759,7 +1984,43 @@ defCard('13d',{lv:13,step:3,tpl:'chain',name:'거꾸로 풀기',
  check(q,ans){const L=2*q.r*q.n;return sumN(ans[0],q.n)===L&&ans[1]*2===ans[0];},
  hint:q=>'선분 ㄱㄴ을 원의 개수로 나누면 지름! 지름을 반으로 나누면 반지름이야.',
  text:q=>`원 ${q.n}개, 선분 ㄱㄴ ${2*q.r*q.n} cm → 반지름 □`});
-const LVCARDS={9:['9a','9b','9c','9d','9e','9f','9g','9h'],10:['10b','10d','10f','10g','10a','10c','10e','10h'],11:['11a','11d','11e','11b','11c','11f','11g','11h'],12:['12a','12b','12c','12d','12e','12f'],13:['13a','13b','13c','13d']};
+/* ===== Lv14 분수 (v2.19) ===== 카드 안의 분수는 글자(3/4)로 씀 */
+defCard('14a',{lv:14,step:1,tpl:'chain',name:'단위분수 먼저',
+ gen(){const d=rnd(3,9);return {a:d*rnd(2,9),d,m:rnd(2,d-1)};},
+ build(q){const u=q.a/q.d;return {lead:`${q.a}의 ${q.m}/${q.d}${josa(q.m,'은는').slice(String(q.m).length)} 1/${q.d}이 ${q.m}개야. 1/${q.d}부터 구해 보자!`,
+   rows:[{t:[q.a+'의 1/'+q.d,'=',q.a,'÷',q.d,'=',B(0)]},{t:[q.a+'의 '+q.m+'/'+q.d,'=','1/'+q.d+' 값','×',q.m,'=',B(1)],cls:'br'}],ans:[u,u*q.m]};},
+ check(q,ans){return sumN(ans[0],q.d)===q.a&&ans[1]*q.d===q.a*q.m;},
+ hint:q=>`${q.a}을(를) 똑같이 ${q.d}묶음으로 나눈 한 묶음이 1/${q.d}이야. 거기에 ${q.m}을(를) 곱해 봐!`.replace(/(\d+)을\(를\)/g,(x,n)=>josa(n,'을를')),
+ text:q=>`${q.a}의 ${q.m}/${q.d} → 1/${q.d}부터`});
+defCard('14b',{lv:14,step:1,tpl:'chain',name:'묶음으로 보기',
+ gen(){for(;;){const g=rnd(2,9),G=rnd(3,8),j=rnd(1,G-1);if(g*G<=72)return {g,G,j};}},
+ build(q){const N=q.g*q.G,x=q.g*q.j;return {lead:`${josa(N,'은는')} ${q.g}씩 몇 묶음이고, ${josa(x,'은는')} ${q.g}씩 몇 묶음일까? 전체 묶음 수가 분모, ${x}의 묶음 수가 분자야!`,
+   rows:[{t:[josa(N,'은는')+' '+q.g+'씩','=',N,'÷',q.g,'=',B(0),'묶음']},{t:[josa(x,'은는')+' '+q.g+'씩','=',x,'÷',q.g,'=',B(1),'묶음'],cls:'br'}],ans:[q.G,q.j]};},
+ check(q,ans){return sumN(q.g,ans[0])===q.g*q.G&&sumN(q.g,ans[1])===q.g*q.j;},
+ hint:q=>`나눗셈으로 묶음 수를 세어 봐! 전체 묶음 수가 분모, 그중 몇 묶음인지가 분자야.`,
+ text:q=>`${josa(q.g*q.j,'은는')} ${q.g*q.G}의 몇 분의 몇? (${q.g}씩 묶기)`});
+defCard('14c',{lv:14,step:2,tpl:'chain',name:'부분으로 전체 구하기',
+ gen(){const d=rnd(3,12);return {d,m:rnd(2,d-1),q:rnd(2,9)};},
+ build(q){const x=q.m*q.q;return {lead:`${q.m}/${q.d}${josa(q.m,'이가').slice(String(q.m).length)} ${x}이야. 1/${q.d}부터 거꾸로 구하고, 전체(${q.d}/${q.d})를 찾아보자!`,
+   rows:[{t:['1/'+q.d,'=',x,'÷',q.m,'=',B(0)]},{t:['전체','=','1/'+q.d+' 값','×',q.d,'=',B(1)],cls:'br'}],ans:[q.q,q.q*q.d]};},
+ check(q,ans){return sumN(ans[0],q.m)===q.m*q.q&&ans[1]*q.m===q.m*q.q*q.d;},
+ hint:q=>`${q.m}/${q.d}${josa(q.m,'은는').slice(String(q.m).length)} 1/${q.d}이 ${q.m}개! 그러니까 ${josa(q.m,'으로')} 나누면 1/${q.d}이야.`,
+ text:q=>`${q.m}/${q.d} = ${q.m*q.q} → 전체 □`});
+defCard('14d',{lv:14,step:2,tpl:'chain',name:'단위 바꾸고 계산',
+ gen(){for(;;){const d=pick([3,4,5,6,7,8,9]),c=rnd(1,99);if((100+c)%d===0)return {c,d,m:rnd(2,d-1)};}},
+ build(q){const T=100+q.c;return {lead:`먼저 cm로 바꾼 다음, 분수만큼을 구해 보자!`,
+   rows:[{t:['1 m '+q.c+' cm','=',B(0),'cm']},{t:['그 길이의 1/'+q.d,'=',B(1),'cm'],cls:'br'},{t:['그 길이의 '+q.m+'/'+q.d,'=',B(2),'cm'],cls:'br'}],ans:[T,T/q.d,T/q.d*q.m]};},
+ check(q,ans){return ans[0]===100+q.c&&sumN(ans[1],q.d)===ans[0]&&ans[2]===sumN(ans[1],q.m);},
+ hint:q=>'1 m = 100 cm! 먼저 모두 cm로 바꿔 봐.',
+ text:q=>`1 m ${q.c} cm의 ${q.m}/${q.d}`});
+defCard('14e',{lv:14,step:3,tpl:'chain',name:'1/분모가 몇 개일까',
+ gen(){const d=rnd(2,9);return {w:rnd(1,6),n:rnd(1,d-1),d};},
+ build(q){return {lead:`대분수 ${q.w} ${q.n}/${q.d}에는 1/${q.d}이 몇 개 들어 있을까? 자연수 1에는 1/${q.d}이 ${q.d}개 있어!`,
+   rows:[{t:['자연수 '+q.w,'→','1/'+q.d+'이',B(0),'개']},{t:[q.w+' '+q.n+'/'+q.d,'→','1/'+q.d+'이',B(1),'개'],cls:'br'},{t:['그래서 '+q.w+' '+q.n+'/'+q.d+' = (1/'+q.d+'의 개수)/'+q.d],cls:'given'}],ans:[q.w*q.d,q.w*q.d+q.n]};},
+ check(q,ans){return ans[0]===sumN(q.d,q.w)&&ans[1]-q.n===ans[0];},
+ hint:q=>`자연수 ${q.w}에는 1/${q.d}이 ${q.d} × ${q.w}개! 거기에 ${q.n}개를 더해 봐.`,
+ text:q=>`${q.w} ${q.n}/${q.d} → 1/${q.d}이 □개`});
+const LVCARDS={9:['9a','9b','9c','9d','9e','9f','9g','9h'],10:['10b','10d','10f','10g','10a','10c','10e','10h'],11:['11a','11d','11e','11b','11c','11f','11g','11h'],12:['12a','12b','12c','12d','12e','12f'],13:['13a','13b','13c','13d'],14:['14a','14b','14c','14d','14e']};
 const RVCARDS={3:['3r'],4:['4r','4g'],5:['5r','5z'],6:['6r'],7:['7r','7s']};
 function cmpCode(l,r){return l<r?0:l===r?1:2;}
 function cardBuild(p){return CARDS[p.card].build(p.q);}
@@ -1793,7 +2054,7 @@ function special(lv,s){
  return null;
 }
 function vertCols(p){const la=String(p.a).length,lb=String(p.b).length;return p.op==='×'?la+lb:p.op==='-'?la:Math.max(la,lb)+1;}
-return {setRng,gen,tryGen,present,vertCols,baseOf,TODAY_KEYS,BASIC_KEYS,CARDS,LVCARDS,RVCARDS,makeCard,cardsFor,cardBuild,cmpCode,special,genSpecial,SEMS,semIdx,semLimit,semLevels,josa,qty,solve,verify,expected,grade,diagnose,hint,explain,splitParts,totalLabel,buildMission,problemText,starsFor,nextLevel,carriesAdd,borrowsSub,carriesMul1,dig,LEVELS:LV,WORLDS,READY,ORDER,rank,STEPS,circText,QUICK,PRIMARY,ALT,fmtQ,key,opSym};
+return {setRng,gen,tryGen,present,vertCols,baseOf,TODAY_KEYS,BASIC_KEYS,CARDS,LVCARDS,RVCARDS,makeCard,cardsFor,cardBuild,cmpCode,special,genSpecial,SEMS,semIdx,semLimit,semLevels,josa,qty,solve,verify,expected,grade,diagnose,hint,explain,splitParts,totalLabel,buildMission,problemText,starsFor,nextLevel,carriesAdd,borrowsSub,carriesMul1,dig,LEVELS:LV,WORLDS,READY,ORDER,rank,STEPS,circText,fracQ,fracFmt,fracLayout,fracAns,QUICK,PRIMARY,ALT,fmtQ,key,opSym};
 })();
 /*CORE-END*/
 
@@ -1950,8 +2211,8 @@ function save(){
    웹앱 버전(BUILD='web')에서만 동작. 테스트판(claude 링크)과 공개 출시판에서는 꺼짐.
    가족 코드는 이 기기에만 저장되고, 서버에는 코드의 해시(암호화된 지문)만 저장됨. */
 const BUILD='web';
-const APP_VER='2.18.1 · 2026-10-29';
-const APP_BUILD='7a0c19305d';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
+const APP_VER='2.19 · 2026-10-29';
+const APP_BUILD='2b1f753e59';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
 const SYNC_DEFAULT={"url": "https://mupsdurscfkbuptmsxtr.supabase.co", "key": "sb_publishable_3Wa_MeVRfkQI0JEysg2PZA_F6PfrZQ8"};
 const SKEY='numforest-sync';
 const SYNC={
@@ -2690,6 +2951,7 @@ function renderProblem(){
       h=`<div class="pwrap"><p class="story">${q}</p><div class="cups"><div class="cupbox">${cupSVG(p.A,p.u)}<span>${f(p.A)}</span></div><span class="cupop">${sym}</span><div class="cupbox">${cupSVG(p.B,p.u)}<span>${f(p.B)}</span></div></div>
         <div class="horiz small">${fbox(0)}<span class="un">${p.u[0]}</span>${fbox(1)}<span class="un">${p.u[1]}</span></div></div>`;break;}
     case 'card':h=cardHTML(p);break;
+    case 'frac':h=fracHTML(p);break;
     case 'circ':h=`<div class="pwrap"><div class="circfig">${circSVG(p)}</div><p class="story">${esc(C.circText(p))}</p><div class="horiz small">${fbox(0)}<span class="un">cm</span></div></div>`;break;
     case 'split':
       h=`<div class="pwrap"><p class="story">${p.a} × ${josa(p.b,'을를')} 쪼개서 곱해 보자!</p><div class="split">${p.fields.map((f,i)=>`<div class="srow${f.total?' tot':''}"><span class="sl">${esc(f.label)}</span><span>=</span>${fbox(i)}</div>`).join('')}</div></div>`;break;
@@ -2741,6 +3003,44 @@ function circSVG(p){
     case 'tri':{const r=32,ax=60,ay=110,bx=ax+2*r,by=ay,cx=ax+r,cy=ay-Math.sqrt(3)*r;let b=C0(ax,ay,r)+C0(bx,by,r)+C0(cx,cy,r);
       b+=`<polygon points="${ax},${ay} ${bx},${by} ${cx},${cy}" fill="none" stroke="${Q}" stroke-width="2.6"/>`+Ln(bx,by,bx+r,by,RL)+T(bx+r/2+2,by+16,cm(p.r),RL,13);
       return wrap(200,170,b+T(100,162,'세 변의 길이의 합 ?',Q,14));}
+  }
+  return '';
+}
+/* ---------- v2.19 분수 화면 ---------- */
+/* 문장 속 ⟦n/d⟧ ⟦w n/d⟧ → 위아래 분수 */
+function frHTML(t){return esc(t).replace(/⟦(\d+) (\d+)\/(\d+)⟧/g,'<span class="mx"><span>$1</span><span class="frc"><span>$2</span><span>$3</span></span></span>').replace(/⟦(\d+)\/(\d+)⟧/g,'<span class="frc"><span>$1</span><span>$2</span></span>');}
+function fracHTML(p){
+  const Q=C.fracQ(p),L=C.fracLayout(p),U={ofM:'개',len:'cm',m2cm:'cm',time:'분',sec:'초',some:'cm',mcm:'cm'}[p.k]||'';
+  const pic=fracPic(p),story=Q.story?`<p class="story fstory">${frHTML(Q.story)}</p>`:'';
+  const st=(top,bot)=>`<span class="fst">${top}<span class="fbar"></span>${bot}</span>`;
+  const bad=i=>P.bad[0]&&P.inp[0]===String(i)?' bad struck':'';
+  let ans='';
+  if(L==='ch'){
+    if(Q.opts)ans=`<div class="fchoices">${Q.opts.map((o,i)=>`<button type="button" class="choice${P.inp[0]===String(i)?' on':''}${bad(i)}" data-ch="${i}">${frHTML(o)}</button>`).join('')}</div>`;
+    else ans=`<div class="fq">${frHTML(Q.left)}<span class="fchoices">${['<','=','>'].map((x,i)=>`<button type="button" class="choice${P.inp[0]===String(i)?' on':''}${bad(i)}" data-ch="${i}" aria-label="${['작아요','같아요','커요'][i]}">${x}</button>`).join('')}</span>${frHTML(Q.right)}</div>`;
+  }else{
+    const box=L==='fr2'?st(fbox(1),fbox(0)):L==='frN'?st(fbox(0),`<span class="fd">${p.d}</span>`):L==='mixW'?fbox(0)+st(fbox(1),`<span class="fd">${p.d}</span>`):L==='mix3'?fbox(0)+st(fbox(2),fbox(1)):fbox(0)+(U?`<span class="un">${U}</span>`:'');
+    const pre=Q.pre?`<span class="txt">${frHTML(Q.pre)}</span>`:'',suf=Q.suf?`<span class="txt">${frHTML(Q.suf)}</span>`:'';
+    ans=`<div class="fq">${pre}${box}${suf}</div>`;
+  }
+  return `<div class="pwrap">${pic?`<div class="circfig">${pic}</div>`:''}${story}${ans}</div>`;
+}
+/* 분수 그림: 피자(원 조각)·육각형·막대·구슬 묶음·여러 원 */
+function fracPic(p){
+  const S='#2E4057',ON='#FFB347',OFF='#FFFFFF';
+  const wrap=(w,h,b)=>`<svg viewBox="0 0 ${w} ${h}" style="aspect-ratio:${w}/${h}" aria-hidden="true">${b}</svg>`;
+  const pie=(cx,cy,r,d,m)=>{let b='';for(let i=0;i<d;i++){const a0=-Math.PI/2+2*Math.PI*i/d,a1=a0+2*Math.PI/d,x0=cx+r*Math.cos(a0),y0=cy+r*Math.sin(a0),x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1);
+      b+=d===1?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${m?ON:OFF}" stroke="${S}" stroke-width="2.5"/>`:`<path d="M${cx} ${cy} L${x0.toFixed(1)} ${y0.toFixed(1)} A${r} ${r} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}Z" fill="${i<m?ON:OFF}" stroke="${S}" stroke-width="2.5" stroke-linejoin="round"/>`;}return b;};
+  switch(p.k){
+    case 'pic':{
+      if(p.sh==='bar'){const W=40*p.d;let b='';for(let i=0;i<p.d;i++)b+=`<rect x="${10+40*i}" y="20" width="40" height="60" fill="${i<p.m?ON:OFF}" stroke="${S}" stroke-width="2.5"/>`;return wrap(W+20,100,b);}
+      if(p.sh==='hex'){const cx=80,cy=75,r=66;let b='';for(let i=0;i<6;i++){const a0=-Math.PI/2+Math.PI/3*i,a1=a0+Math.PI/3;b+=`<path d="M${cx} ${cy} L${(cx+r*Math.cos(a0)).toFixed(1)} ${(cy+r*Math.sin(a0)).toFixed(1)} L${(cx+r*Math.cos(a1)).toFixed(1)} ${(cy+r*Math.sin(a1)).toFixed(1)}Z" fill="${i<p.m?ON:OFF}" stroke="${S}" stroke-width="2.5" stroke-linejoin="round"/>`;}return wrap(160,150,b);}
+      return wrap(160,150,pie(80,75,66,p.d,p.m));}
+    case 'grp':{const G=p.N/p.g,per=Math.min(G,3),rows=Math.ceil(G/per),bw=p.g*26+12,W=per*(bw+12)+8,H=rows*48+10;let b='';
+      for(let k=0;k<G;k++){const gx=8+(k%per)*(bw+12),gy=8+Math.floor(k/per)*48;b+=`<rect x="${gx}" y="${gy}" width="${bw}" height="38" rx="12" fill="none" stroke="#E8505B" stroke-width="2.2"/>`;
+        for(let i=0;i<p.g;i++)b+=`<circle cx="${gx+19+26*i}" cy="${gy+19}" r="10" fill="#FF9A5C" stroke="#C7642E" stroke-width="2"/>`;}
+      return wrap(W,H,b);}
+    case 'picM':{const n=p.w+1,W=n*110+10;let b='';for(let i=0;i<p.w;i++)b+=pie(60+110*i,60,48,p.d,p.d);b+=pie(60+110*p.w,60,48,p.d,p.n);return wrap(W,120,b);}
   }
   return '';
 }
@@ -2813,7 +3113,7 @@ function cardHTML(p){
   }
   return '';
 }
-function isChoice(p,i){return p&&p.game==='card'&&(p.tpl==='pick'||p.tpl==='cmp')&&i===0;}
+function isChoice(p,i){return p&&(p.game==='card'&&(p.tpl==='pick'||p.tpl==='cmp')||p.op==='frac'&&p.choice)&&i===0;}
 const josa=C.josa;
 $('problem').addEventListener('click',e=>{
   const ch=e.target.closest('.choice');
@@ -2933,7 +3233,7 @@ function pickPracLevel(){
 function nextPracProblem(){
   const ss=PR.sess;
   for(let t=0;t<200;t++){const l=pickPracLevel(),p=C.gen(l,ss.step),k=C.key(p);if(ss.seen[k]&&t<199)continue;ss.seen[k]=1;
-    return C.present(p,l===13&&Math.random()<.5?'circapp':C.PRIMARY[l]);}
+    return C.present(p,l===13&&Math.random()<.5?'circapp':l===14&&Math.random()<.5?'fracapp':C.PRIMARY[l]);}
 }
 function loadPracProblem(first){
   const ss=PR.sess;
@@ -3068,7 +3368,7 @@ function submit(){
     if(prac&&st.kind==='time'&&P.wrong>=2){tone(SND.no);toast('정답은 '+C.explain(p).answer.replace('정답: ','')+'. 다음 문제!');P.lock=true;addSec(liveSec());st.idx++;st.w=null;st.skip=(st.skip||0)+1;pracAdvance(600);return;}
     const type=C.diagnose(p,P.inp,g.res);
     /* v2.13 틀린 숫자는 지우지 않고 빨간 줄을 그어 남겨 둠 → 그 칸을 누르면 지우고 새로 씀. 방금 쓴 답도 문제 아래에 보여 줌 */
-    {const wr=P.inp.filter((v,i)=>!g.res[i]&&v!=='');P.last=(p.base||p.op==='÷r'||isChoice(p,0)||P.inp.length===1||!wr.length)?inpText(p,P.inp):wr.join(' / ');}P.bad=g.res.map(x=>!x);P.af=Math.max(0,g.res.findIndex(x=>!x));
+    {const wr=P.inp.filter((v,i)=>!g.res[i]&&v!=='');P.last=(p.base||p.op==='÷r'||p.op==='frac'||isChoice(p,0)||P.inp.length===1||!wr.length)?inpText(p,P.inp):wr.join(' / ');}P.bad=g.res.map(x=>!x);P.af=Math.max(0,g.res.findIndex(x=>!x));
     tone(SND.no);w.classList.add('nod');
     const pr=$('problem');pr.classList.remove('shake');void pr.offsetWidth;pr.classList.add('shake');
     if(P.wrong===1)say(rndOf(RETRY));
@@ -3078,6 +3378,7 @@ function submit(){
   }
 }
 function inpText(p,inp){
+  if(p.op==='frac')return C.fracFmt(p,inp);
   if(p.game==='card'){if(p.tpl==='cmp')return ['<','=','>'][+inp[0]]||'?';if(p.tpl==='pick')return (+inp[0]+1)+'번'+(inp.length>1?' / '+inp.slice(1).join(' … '):'');return inp.join(' / ');}
   if(p.base)return inp[0]+p.u[0]+' '+inp[1]+p.u[1];
   if(p.op==='÷r')return inp[0]+' … '+inp[1];
@@ -3085,6 +3386,7 @@ function inpText(p,inp){
   return inp[0];
 }
 function ansText(p,exp){
+  if(p.op==='frac')return C.fracFmt(p,exp);
   if(p.game==='card'){if(p.tpl==='cmp')return ['<','=','>'][exp[0]];if(p.tpl==='pick')return (exp[0]+1)+'번'+(exp.length>1?' / '+exp.slice(1).join(' … '):'');return exp.join(' / ');}
   if(p.base)return C.fmtQ(p.u,exp);
   if(p.op==='÷r')return exp[0]+' … '+exp[exp.length-1];
