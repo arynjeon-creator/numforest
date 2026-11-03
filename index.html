@@ -161,6 +161,22 @@ body.obs #forest{display:none}
 .dots span{width:15px;height:15px;border-radius:50%;background:var(--lock)}
 .dots span.done{background:var(--grass)}
 .dots span.now{background:var(--sun);transform:scale(1.25)}
+/* v2.21 다시 보기 */
+.dots span.ok{background:var(--grass)}
+.dots span.ng{background:#E8505B}
+.dots span.rvcur{transform:scale(1.4);box-shadow:0 0 0 3px var(--sun)}
+#play.review .dots span{cursor:pointer}
+#play.review #problem button{pointer-events:none}
+.revpanel{display:flex;flex-direction:column;gap:12px;justify-content:center;background:var(--paper);border:3px solid var(--line);border-radius:28px;padding:16px}
+.revpanel .revres{margin:0;text-align:center;font-family:var(--font-display);font-size:calc(22px * var(--fs));line-height:1.4}
+.revpanel .revres.ok{color:var(--grass-deep)}
+.revpanel .revres.ng{color:#C2412C}
+.revpanel .revsum{margin:0;text-align:center;color:var(--ink-soft)}
+.revnav{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.revnav .btn{font-size:calc(20px * var(--fs));padding:14px 6px}
+.revtabs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.revtabs .btn{padding:6px 10px;font-size:calc(15px * var(--fs))}
+.revtabs .btn.on{background:var(--sun);border-color:var(--sun)}
 .problem{flex:1;display:flex;align-items:center;justify-content:center;padding-block:6px;min-height:200px;overflow-x:auto;min-width:0}
 .pwrap{display:flex;flex-direction:column;gap:12px;align-items:center;max-width:100%}
 .story{font-size:calc(17px * var(--fs));color:var(--ink);text-align:center;margin:0;line-height:1.5;max-width:34em}
@@ -578,6 +594,7 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
         <div class="problem" id="problem"></div>
       </div>
       <div class="keypad" id="keypad"></div>
+      <div class="revpanel" id="revPanel" hidden></div>
     </div>
   </section>
 
@@ -696,6 +713,7 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
       <h2>오늘 한눈에</h2>
       <div class="kpis" id="repToday"></div>
       <div class="rstages" id="repStages"></div>
+      <div class="tools" style="justify-content:center;margin-top:10px"><button class="btn primary" id="repProbs" type="button">오늘 문제 모두 보기</button></div>
     </div>
     <div class="panel">
       <h2>짝꿍의 한 줄 평</h2>
@@ -711,7 +729,7 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
       <p id="repLevel"></p>
     </div>
     <div class="panel">
-      <h2>다르게 풀기 카드 <span class="tag">엄마만 보는 정보 · 개울 건너기 8문제 중 7개를 한 번에 맞히면 통과</span></h2>
+      <h2>다르게 풀기 카드 <span class="tag">엄마만 보는 정보 · 개울 건너기 6·8·10문제 중 5·7·9개를 한 번에 맞히면 통과</span></h2>
       <div class="tbl" id="repCards"></div>
     </div>
     <div class="panel">
@@ -987,6 +1005,13 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
     <h2 id="forestTitle" style="margin:0"></h2>
     <p id="forestText" style="margin:0"></p>
     <div class="tools" style="justify-content:center"><button class="btn primary" id="forestOk" type="button">도감 보기</button><button class="btn" id="forestPartner" type="button">짝꿍 하기</button><button class="btn" id="forestClose" type="button">닫기</button></div>
+  </div>
+</div>
+<div class="overlay" id="obsPick" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="obsPickT">
+    <h3 id="obsPickT">스테이지 보기</h3>
+    <p style="margin:0;text-align:center">문제 목록은 아이가 푼 결과와 정답을 함께 보여 줘요.</p>
+    <div class="tools" style="justify-content:center"><button class="btn primary" id="obsPickList" type="button">문제 목록 보기</button><button class="btn" id="obsPickPlay" type="button">직접 풀어 보기</button><button class="btn" id="obsPickNo" type="button">닫기</button></div>
   </div>
 </div>
 <div class="overlay" id="goalBox" hidden>
@@ -2237,8 +2262,8 @@ function save(){
    웹앱 버전(BUILD='web')에서만 동작. 테스트판(claude 링크)과 공개 출시판에서는 꺼짐.
    가족 코드는 이 기기에만 저장되고, 서버에는 코드의 해시(암호화된 지문)만 저장됨. */
 const BUILD='web';
-const APP_VER='2.20 · 2026-11-03';
-const APP_BUILD='84552f8bd7';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
+const APP_VER='2.21 · 2026-11-03';
+const APP_BUILD='d23f44d973';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
 const SYNC_DEFAULT={"url": "https://mupsdurscfkbuptmsxtr.supabase.co", "key": "sb_publishable_3Wa_MeVRfkQI0JEysg2PZA_F6PfrZQ8"};
 const SKEY='numforest-sync';
 const SYNC={
@@ -2549,7 +2574,7 @@ function setScene(key){const el=$('scene');if(el)el.innerHTML=sceneHTML(key);}
 
 /* ---------- 화면 전환 ---------- */
 const SCREENS=['home','play','reward','collection','decoScr','parent','practice','report','rules','trade'];
-function show(id){SCREENS.forEach(s=>$(s).hidden=(s!==id));window.scrollTo(0,0);if(id!=='play'){stopTicker();closeMemoPad();}if(id==='home'){if(SYNC.pending)SYNC.applyIfIdle();setTimeout(()=>{if(!$('home').hidden)showMomMsg();},400);}}
+function show(id){SCREENS.forEach(s=>$(s).hidden=(s!==id));{const rv=id==='play'&&P.mode==='review';$('keypad').hidden=rv;$('revPanel').hidden=!rv;$('play').classList.toggle('review',rv);}window.scrollTo(0,0);if(id!=='play'){stopTicker();closeMemoPad();}if(id==='home'){if(SYNC.pending)SYNC.applyIfIdle();setTimeout(()=>{if(!$('home').hidden)showMomMsg();},400);}}
 
 /* ---------- 홈 ---------- */
 const NODES=[[85,270],[265,130],[450,265],[630,130],[805,265]],CHEST=[935,150];
@@ -2617,7 +2642,7 @@ function renderHome(){
   renderForest();
   $('updBar').hidden=!UPD||!!OBS;
   if(state.forest&&state.forest.pend&&!OBS)setTimeout(showForestFind,350);
-  $('mapHelp').textContent=OBS?'관찰 모드: 아무 스테이지나 눌러서 들어가 보세요 (끝낸 스테이지도 다시 볼 수 있어요)':egg?'황금 알을 눌러 보세요!':t.done?'오늘 도장을 받았어요! 도장판을 눌러 보세요':'반짝이는 동그라미를 눌러 시작해요';
+  $('mapHelp').textContent=OBS?'관찰 모드: 아무 스테이지나 눌러서 들어가 보세요 (끝낸 스테이지도 다시 볼 수 있어요)':egg?'황금 알을 눌러 보세요!':t.done?'오늘 도장을 받았어요! 끝낸 스테이지를 누르면 다시 볼 수 있어요':t.stages.some(x=>x.stars>0)?'반짝이는 동그라미를 눌러요 · 끝낸 곳은 눌러서 다시 볼 수 있어요':'반짝이는 동그라미를 눌러 시작해요';
   /* 폰처럼 좁은 화면: 지금 할 스테이지가 보이게 지도를 옆으로 이동 */
   const mw=$('map').parentElement;if(mw.scrollWidth>mw.clientWidth+2){const tx=(egg||t.done)?CHEST[0]:(NODES[Math.max(0,cur)]||NODES[0])[0];mw.scrollLeft=Math.max(0,tx/1000*mw.scrollWidth-mw.clientWidth/2);}
 }
@@ -2781,6 +2806,68 @@ function tradeReportHTML(){
   return `<p class="note"><b>거래</b> · ${today}</p>`+(T5.length?`<ul class="plain">${T5.map(x=>`<li>${x.d.slice(5).replace('-','/')} 거래: 별 ${x.cost||TRADE.cost}개 → 다이아몬드 ${x.gain||TRADE.gain}개</li>`).join('')}</ul>`:'');
 }
 
+/* ---------- v2.21 다시 보기: 끝낸 스테이지(아이) · 오늘 문제 모두(엄마). 보기만 하고 고칠 수 없음 ---------- */
+/* 문제마다 기록: w 틀린 횟수, a 처음 쓴 답(화면에 보인 글자), f 마지막에 맞힌 답, c 메모 칸, h 힌트, x 풀이, s 걸린 초 */
+function revRec(st){st.log=st.log||[];return st.log[st.idx]||(st.log[st.idx]={});}
+const RV={mom:false,i:0,back:'home',t:null};
+function rvRes(t,st,k){
+  const done=st.stars>0||k<st.idx,lg=(st.log||[])[k];
+  if(!done)return {done:false};
+  if(lg)return {done:true,w:lg.w||0,a:lg.a||'',f:lg.f,c:lg.c,d:lg.d,h:!!lg.h,x:!!lg.x};
+  /* 2.21 전에 푼 문제: 엄마 리포트의 틀린 문제 기록에서 찾아봄 */
+  const q=C.problemText(st.probs[k]),e=(t.errs||[]).find(e=>e.src==='mission'&&e.stage===st.name&&e.q===q);
+  return {done:true,w:e?1:0,a:e?e.a:'',old:true};
+}
+function openReview(si,mom,back){
+  RV.mom=mom;RV.back=back;RV.t=OBS?JSON.parse(OBS.snap).today:T();RV.i=0;
+  clearTimeout(P.timer);P.timer=null;closeMemoPad();
+  P.mode='review';P.si=si;$('backBtn').textContent=back==='report'?'← 리포트':'← 지도';
+  show('play');setScene(RV.t.stages[si].key);$('guideMon').innerHTML=avatarHTML(partner());$('timerChip').hidden=true;
+  renderReview();
+}
+function rvGo(d){const st=RV.t.stages[P.si],n=st.probs.length,j=RV.i+d;if(j<0||j>=n)return;RV.i=j;tone(SND.tap);renderReview();}
+function renderReview(){
+  const t=RV.t,st=t.stages[P.si],k=RV.i,p=st.probs[k],r=rvRes(t,st,k),n=st.probs.length;
+  const ex=C.expected(p).map(String);
+  P.p=p;P.af=-1;P.bad=[];P.lock=true;P.busy=false;P.memoI=-1;P.hintText='';
+  P.carry=(r.c||[]).slice();P.dealt=p.game==='candy'?(r.d!=null?r.d:(r.done||RV.mom?Math.floor(p.a/p.b):0)):0;
+  P.inp=(r.done&&r.f)?r.f.slice():ex;P.last=r.done&&r.w?r.a:'';
+  $('hintLine').hidden=true;
+  renderProblem();
+  if(r.done&&(r.h||r.x)){$('hintLine').hidden=false;$('hintLine').textContent=r.x?'세 번 틀려서 풀이를 보고 넘어갔어요':'두 번 틀려서 힌트를 봤어요';}
+  $('dots').hidden=false;
+  $('dots').innerHTML=st.probs.map((_,j)=>{const q=rvRes(t,st,j);return `<span class="${q.done?(q.w?'ng':'ok'):''}${j===k?' rvcur':''}" data-rv="${j}" role="button" aria-label="${j+1}번 문제"></span>`;}).join('');
+  $('stageTitle').textContent=st.name+(RV.mom?' 문제 보기':' 다시 보기');
+  $('progChip').textContent=(k+1)+'/'+n;
+  let res,cls;
+  if(!r.done){res='아직 안 푼 문제예요 · 정답을 넣어 보여 줘요';cls='';}
+  else if(!r.w){res=(k+1)+'번: 한 번에 맞혔어요 ✓';cls='ok';}
+  else if(r.x){res=(k+1)+'번: 세 번 틀리고 풀이를 봤어요';cls='ng';}
+  else if(r.old){res=(k+1)+'번: 처음엔 틀렸지만 다시 풀어서 맞혔어요';cls='ng';}
+  else{res=(k+1)+'번: '+['','두','세','네','다섯'][Math.min(4,r.w)]+' 번째에 맞혔어요';cls='ng';}
+  const dn=st.probs.map((_,j)=>rvRes(t,st,j)).filter(q=>q.done),one=dn.filter(q=>!q.w).length;
+  say(!r.done?'이 문제는 아직 안 풀었어.':!r.w?'이 문제는 한 번에 맞혔지! 최고야.':r.x?'이 문제는 어려웠지? 다음엔 꼭 맞혀 보자.':'처음엔 틀렸지만 끝까지 해냈어!');
+  const tabs=RV.mom?`<div class="revtabs">${t.stages.map((s2,j)=>`<button type="button" class="btn${j===P.si?' on':''}" data-rvs="${j}">${esc(s2.name)}${s2.stars>0?' ✓':s2.idx>0?' …':''}</button>`).join('')}</div>`:'';
+  $('revPanel').innerHTML=`${tabs}<p class="revres ${cls}">${esc(res)}</p>
+    <p class="revsum">${dn.length?`푼 문제 ${dn.length}/${n} · 한 번에 맞힌 문제 ${one}개`:'아직 푼 문제가 없어요'}${RV.mom?'':' · 보기만 할 수 있어요'}</p>
+    <div class="revnav"><button type="button" class="btn" data-rvgo="-1" ${k===0?'disabled':''}>◀ 이전</button><button type="button" class="btn primary" data-rvgo="1" ${k===n-1?'disabled':''}>다음 ▶</button></div>
+    <button type="button" class="btn" data-rvback="1">${RV.back==='report'?'리포트로 돌아가기':'지도로 돌아가기'}</button>`;
+}
+function closeReview(){
+  P.mode='mission';P.lock=false;P.last='';P.carry=[];
+  if(RV.back==='report'){renderReport();show('report');}else{renderHome();show('home');}
+}
+$('revPanel').addEventListener('click',e=>{
+  const g=e.target.closest('[data-rvgo]');if(g){rvGo(+g.dataset.rvgo);return;}
+  const s2=e.target.closest('[data-rvs]');if(s2){P.si=+s2.dataset.rvs;RV.i=0;setScene(RV.t.stages[P.si].key);tone(SND.tap);renderReview();return;}
+  if(e.target.closest('[data-rvback]'))closeReview();
+});
+$('dots').addEventListener('click',e=>{if(P.mode!=='review')return;const d=e.target.closest('[data-rv]');if(d){RV.i=+d.dataset.rv;tone(SND.tap);renderReview();}});
+$('repProbs').onclick=()=>{ensureToday();const t=T();let i=t.stages.findIndex(s=>s.stars===0);if(i<0)i=0;openReview(i,true,'report');};
+$('obsPickList').onclick=()=>{$('obsPick').hidden=true;openReview(P.obsI,true,'home');};
+$('obsPickPlay').onclick=()=>{$('obsPick').hidden=true;const st=T().stages[P.obsI];if(st.stars>0)Object.assign(st,{idx:0,first:0,stars:0,sec:0,w:null,goalSeen:false});startStage(P.obsI);};
+$('obsPickNo').onclick=()=>{$('obsPick').hidden=true;};
+
 /* ---------- 엄마 관찰 모드 ---------- */
 function startObserve(){
   ensureToday();ensureForest();
@@ -2839,8 +2926,8 @@ $('map').addEventListener('click',e=>{
   if(dayChanged())return;
   if(g.dataset.chest){if(OBS){toast('관찰 모드에서는 도장판을 열지 않아요');return;}tone(SND.tap);if(state.dojang.eggs>0)startReward();else openStamps(false);return;}
   const i=+g.dataset.i,cur=curStage();
-  if(OBS){const st=T().stages[i];if(st.stars>0){Object.assign(st,{idx:0,first:0,stars:0,sec:0,w:null,goalSeen:false});}tone(SND.tap);startStage(i);return;}
-  if(T().stages[i].stars>0){toast('이미 끝낸 스테이지예요');return;}
+  if(OBS){tone(SND.tap);P.obsI=i;$('obsPick').hidden=false;$('obsPickList').focus();return;}
+  if(T().stages[i].stars>0){tone(SND.tap);openReview(i,false,'home');return;}  /* v2.21 끝낸 스테이지는 다시 보기(고치기 안 됨) */
   if(i!==cur){toast('앞 스테이지부터 해요');return;}
   tone(SND.tap);startStage(i);
 });
@@ -2988,7 +3075,8 @@ function renderProblem(){
   }
   /* 일의 자리부터 입력: 세로셈 말고 다른 문제에도 안내 한 줄 */
   if(smallFirst()&&p.game!=='vert'&&p.fields&&p.fields.some((_,i)=>!isChoice(p,i)))h=`<div class="pwrap">${h}<p class="note">일의 자리부터 눌러요</p></div>`;
-  if(P.last)h=`<div class="pwrap">${h}<p class="lastans">방금 쓴 답: <s>${esc(P.last)}</s>${smallFirst()&&p.fields.some((_,i)=>!isChoice(p,i))?' <small>(일의 자리부터 눌렀는지 확인해 봐!)</small>':''}</p></div>`;
+  if(P.last&&P.mode==='review')h=`<div class="pwrap">${h}<p class="lastans">처음 쓴 답: <s>${esc(P.last)}</s></p></div>`;
+  else if(P.last)h=`<div class="pwrap">${h}<p class="lastans">방금 쓴 답: <s>${esc(P.last)}</s>${smallFirst()&&p.fields.some((_,i)=>!isChoice(p,i))?' <small>(일의 자리부터 눌렀는지 확인해 봐!)</small>':''}</p></div>`;
   $('problem').innerHTML=h;
   fitAligned();
 }
@@ -3146,6 +3234,7 @@ function cardHTML(p){
 function isChoice(p,i){return p&&(p.game==='card'&&(p.tpl==='pick'||p.tpl==='cmp')||p.op==='frac'&&p.choice)&&i===0;}
 const josa=C.josa;
 $('problem').addEventListener('click',e=>{
+  if(P.mode==='review')return;
   const ch=e.target.closest('.choice');
   if(ch){if(P.lock||P.busy||overlayOpen())return;P.inp[0]=ch.dataset.ch;P.bad[0]=false;tone(SND.tap);
     if(P.p.fields.length===1){renderProblem();submit();}else{if(P.af===0)P.af=1;renderProblem();}return;}
@@ -3155,7 +3244,7 @@ $('problem').addEventListener('click',e=>{
   if(e.target.closest('#dealReset')){P.dealt=0;renderProblem();}
 });
 function maxLen(){return P.p.game==='vert'?C.vertCols(P.p):P.p.game==='card'?(BOXLEN[P.af]||6):5;}
-function overlayOpen(){return !$('forestBox').hidden||!$('goalBox').hidden||!$('celeBox').hidden||!$('stampBox').hidden||!$('clearBox').hidden||!$('explainBox').hidden||!$('gateBox').hidden||!$('momBox').hidden;}
+function overlayOpen(){return !$('obsPick').hidden||!$('forestBox').hidden||!$('goalBox').hidden||!$('celeBox').hidden||!$('stampBox').hidden||!$('clearBox').hidden||!$('explainBox').hidden||!$('gateBox').hidden||!$('momBox').hidden;}
 function giveCandy(){
   if(P.mode==='mission'){state.candy++;return true;}
   if(!pracCandyOpen())return false;
@@ -3375,6 +3464,7 @@ function submit(){
   const w=$('guideWrap');w.classList.remove('hop','nod');void w.offsetWidth;
   if(g.ok){
     P.lock=true;const dt=liveSec();addSec(dt);
+    if(!prac){const r=revRec(st);r.ok=1;r.f=P.inp.slice();if(P.carry.some(Boolean))r.c=P.carry.slice();if(P.p.game==='candy')r.d=P.dealt;r.s=Math.round(dt);}
     if(P.last||P.bad.some(Boolean)){P.last='';P.bad=[];renderProblem();}
     let gotCandy=false;
     if(P.wrong===0){st.first++;gotCandy=giveCandy();}
@@ -3399,6 +3489,7 @@ function submit(){
     const type=C.diagnose(p,P.inp,g.res);
     /* v2.13 틀린 숫자는 지우지 않고 빨간 줄을 그어 남겨 둠 → 그 칸을 누르면 지우고 새로 씀. 방금 쓴 답도 문제 아래에 보여 줌 */
     {const wr=P.inp.filter((v,i)=>!g.res[i]&&v!=='');P.last=(p.base||p.op==='÷r'||p.op==='frac'||isChoice(p,0)||P.inp.length===1||!wr.length)?inpText(p,P.inp):wr.join(' / ');}P.bad=g.res.map(x=>!x);P.af=Math.max(0,g.res.findIndex(x=>!x));
+    if(!prac){const r=revRec(st);r.w=P.wrong;if(P.wrong===1){r.a=P.last;r.ai=P.inp.slice();}if(P.wrong===2)r.h=1;if(P.wrong>=3)r.x=1;}
     tone(SND.no);w.classList.add('nod');
     const pr=$('problem');pr.classList.remove('shake');void pr.offsetWidth;pr.classList.add('shake');
     if(P.wrong===1)say(rndOf(RETRY));
@@ -3521,6 +3612,7 @@ function advance(silent){
 }
 document.addEventListener('keydown',e=>{
   if($('play').hidden||overlayOpen())return;
+  if(P.mode==='review'){if(e.key==='ArrowLeft')rvGo(-1);else if(e.key==='ArrowRight')rvGo(1);return;}
   if(/^[0-9]$/.test(e.key))press(e.key);else if(e.key==='Backspace')press('del');else if(e.key==='Enter'){e.preventDefault();press('ok');}
   else if(e.key==='Tab'&&P.p&&P.p.fields.length>1){e.preventDefault();P.af=(P.af+1)%P.p.fields.length;renderProblem();}
 });
@@ -3529,6 +3621,7 @@ $('keypad').innerHTML=KEYS.map(k=>`<button type="button" class="key ${k}" data-k
 $('keypad').addEventListener('click',e=>{const b=e.target.closest('.key');if(b)press(b.dataset.k);});
 $('backBtn').onclick=()=>{
   closeMemoPad();
+  if(P.mode==='review'){closeReview();return;}
   if(P.mode==='prac'){clearTimeout(P.timer);P.timer=null;stopTicker();openPractice(PR.tab);return;}
   if(!P.lock){addSec(liveSec());save();}
   clearTimeout(P.timer);P.timer=null;
