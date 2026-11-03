@@ -845,6 +845,12 @@ details.panel summary h2::after{content:" ▾";font-size:16px;color:var(--ink-so
     </div>
 
     <div class="panel">
+      <h2>개울 건너기 카드</h2>
+      <p>지금 레벨의 다르게 풀기 카드예요. 끈 카드는 개울 건너기에 나오지 않고, 레벨 졸업 조건(카드 모두 통과)에서도 빠져요. 모두 끄면 개울 건너기는 기본 계산 문제로 나와요. 바꾼 내용은 내일 미션부터 적용돼요.</p>
+      <div id="cardOffList" class="radios"></div>
+    </div>
+
+    <div class="panel">
       <h2>하루 분량</h2>
       <div id="cntRows" class="radios"></div>
       <p id="cntTotal"></p>
@@ -1730,7 +1736,13 @@ defCard('9e',{lv:9,step:2,tpl:'chain',name:'연결해서 계산하기',
  check(q,ans){return ans[1]===ans[0]*10&&sumN(q.x,q.b)===ans[0];},
  hint:q=>`${josa(q.x*10,'은는')} ${q.x}의 10배야. 그러니까 답도 10배!`,
  text:q=>`${q.x} × ${q.b} → ${q.x*10} × ${q.b}`});
-defCard('9f',{lv:9,step:2,tpl:'chain',name:'거꾸로 풀기',
+defCard('9f2',{lv:9,step:2,tpl:'chain',name:'거꾸로 풀기',
+ gen(){return {d:rnd(2,9),b:rnd(2,9)};},
+ build(q){return {lead:'0을 떼면 구구단이야! 위 칸을 먼저 풀고, 아래 칸에 0을 다시 붙여 보자.',rows:[{t:[B(0),'×',q.b,'=',q.d*q.b]},{t:[B(1),'×',q.b,'=',q.d*q.b*100],cls:'br'}],ans:[q.d,q.d*100]};},
+ check(q,ans){return sumN(ans[0],q.b)===q.d*q.b&&ans[1]===ans[0]*100&&sumN(ans[1],q.b)===q.d*q.b*100;},
+ hint:q=>`0을 두 개 떼면 □ × ${q.b} = ${q.d*q.b}! 구구단 ${q.b}단을 떠올려 봐. 그다음 □에 0을 두 개 붙여.`,
+ text:q=>`□ × ${q.b} = ${q.d*q.b*100}`});
+defCard('9f',{lv:9,step:2,tpl:'chain',name:'거꾸로 풀기(예전)',
  gen(){return {a:rnd(101,999),b:rnd(2,9)};},
  build(q){return {lead:'어떤 수에 곱했더니 이렇게 됐대. 어떤 수는 뭘까?',rows:[{t:[B(0),'×',q.b,'=',q.a*q.b]}],ans:[q.a]};},
  check(q,ans){return sumN(ans[0],q.b)===q.a*q.b;},
@@ -1786,7 +1798,14 @@ defCard('10e',{lv:10,step:3,tpl:'chain',name:'고쳐서 계산하기',
  check(q,ans){const b=q.t+q.sg;return q.a*q.t+q.sg*ans[0]===ans[1]&&sumN(q.a,b)===ans[1];},
  hint:q=>`${josa(q.t+q.sg,'은는')} ${q.t}보다 1 ${q.sg<0?'작으니까':'크니까'}, ${josa(q.a,'을를')} 한 번 ${q.sg<0?'빼':'더해'} 줘!`,
  text:q=>`${q.a} × ${q.t+q.sg} = ${q.a} × ${q.t} ${q.sg<0?'−':'+'} □`});
-defCard('10f',{lv:10,step:2,tpl:'chain',name:'거꾸로 풀기',
+/* v2.20 거꾸로 풀기: 아직 배우지 않은 나눗셈(세·네 자리 ÷)이 나오지 않게, 0을 떼면 구구단 거꾸로로 풀리는 수만 */
+defCard('10f2',{lv:10,step:2,tpl:'chain',name:'거꾸로 풀기',
+ gen(){return {a:rnd(2,9),c:rnd(2,9)};},
+ build(q){return {lead:'0을 떼면 구구단이야! 위 칸을 먼저 풀고, 아래 칸에 0을 다시 붙여 보자.',rows:[{t:[B(0),'×',q.c,'=',q.a*q.c]},{t:[B(1),'×',q.c*10,'=',q.a*q.c*100],cls:'br'}],ans:[q.a,q.a*10]};},
+ check(q,ans){return sumN(ans[0],q.c)===q.a*q.c&&ans[1]===ans[0]*10&&sumN(ans[1],q.c*10)===q.a*q.c*100;},
+ hint:q=>`0을 두 개 떼면 □ × ${q.c} = ${q.a*q.c}! 구구단 ${q.c}단을 떠올려 봐. 그다음 □에 0을 하나 붙여.`,
+ text:q=>`□ × ${q.c*10} = ${q.a*q.c*100}`});
+defCard('10f',{lv:10,step:2,tpl:'chain',name:'거꾸로 풀기(예전)',
  gen(){return {x:rnd(12,99),t:rnd(2,9)*10};},
  build(q){return {lead:'어떤 수에 곱했더니 이렇게 됐대. 어떤 수는 뭘까?',rows:[{t:[B(0),'×',q.t,'=',q.x*q.t]}],ans:[q.x]};},
  check(q,ans){return sumN(ans[0],q.t)===q.x*q.t;},
@@ -2020,7 +2039,9 @@ defCard('14e',{lv:14,step:3,tpl:'chain',name:'1/분모가 몇 개일까',
  check(q,ans){return ans[0]===sumN(q.d,q.w)&&ans[1]-q.n===ans[0];},
  hint:q=>`자연수 ${q.w}에는 1/${q.d}이 ${q.d} × ${q.w}개! 거기에 ${q.n}개를 더해 봐.`,
  text:q=>`${q.w} ${q.n}/${q.d} → 1/${q.d}이 □개`});
-const LVCARDS={9:['9a','9b','9c','9d','9e','9f','9g','9h'],10:['10b','10d','10f','10g','10a','10c','10e','10h'],11:['11a','11d','11e','11b','11c','11f','11g','11h'],12:['12a','12b','12c','12d','12e','12f'],13:['13a','13b','13c','13d'],14:['14a','14b','14c','14d','14e']};
+const LVCARDS={9:['9a','9b','9c','9d','9e','9f2','9g','9h'],10:['10b','10d','10f2','10g','10a','10c','10e','10h'],11:['11a','11d','11e','11b','11c','11f','11g','11h'],12:['12a','12b','12c','12d','12e','12f'],13:['13a','13b','13c','13d'],14:['14a','14b','14c','14d','14e']};
+/* 더 이상 내지 않는 카드 (예전 기록을 보여 주려고 정의만 남김) */
+const RETIRED=['9f','10f'];
 const RVCARDS={3:['3r'],4:['4r','4g'],5:['5r','5z'],6:['6r'],7:['7r','7s']};
 function cmpCode(l,r){return l<r?0:l===r?1:2;}
 function cardBuild(p){return CARDS[p.card].build(p.q);}
@@ -2054,7 +2075,7 @@ function special(lv,s){
  return null;
 }
 function vertCols(p){const la=String(p.a).length,lb=String(p.b).length;return p.op==='×'?la+lb:p.op==='-'?la:Math.max(la,lb)+1;}
-return {setRng,gen,tryGen,present,vertCols,baseOf,TODAY_KEYS,BASIC_KEYS,CARDS,LVCARDS,RVCARDS,makeCard,cardsFor,cardBuild,cmpCode,special,genSpecial,SEMS,semIdx,semLimit,semLevels,josa,qty,solve,verify,expected,grade,diagnose,hint,explain,splitParts,totalLabel,buildMission,problemText,starsFor,nextLevel,carriesAdd,borrowsSub,carriesMul1,dig,LEVELS:LV,WORLDS,READY,ORDER,rank,STEPS,circText,fracQ,fracFmt,fracLayout,fracAns,QUICK,PRIMARY,ALT,fmtQ,key,opSym};
+return {setRng,gen,tryGen,present,vertCols,baseOf,TODAY_KEYS,BASIC_KEYS,CARDS,LVCARDS,RVCARDS,makeCard,cardsFor,cardBuild,cmpCode,special,genSpecial,SEMS,semIdx,semLimit,semLevels,josa,qty,solve,verify,expected,grade,diagnose,hint,explain,splitParts,totalLabel,buildMission,problemText,starsFor,nextLevel,carriesAdd,borrowsSub,carriesMul1,dig,LEVELS:LV,WORLDS,READY,ORDER,rank,RETIRED,STEPS,circText,fracQ,fracFmt,fracLayout,fracAns,QUICK,PRIMARY,ALT,fmtQ,key,opSym};
 })();
 /*CORE-END*/
 
@@ -2142,7 +2163,7 @@ let OBS=null;
 function todayStr(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function dayDiff(a,b){return Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/86400000);}
 function addDays(s,n){const d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return todayStr(d);}
-function defaults(){return {v:2,set:{cur:9,step:1,review:[1,3,4,5,6,7,8],off:[],auto:'approve',counts:[8,8,8,8,8],limit:0,pool:'both',order:'big',memo:true,t3h:true,redo:true,pracRange:'open',sem:'3-2',semLock:true,ahead:false,forestN:20,pracMax:20,pracAfter:false},today:null,col:[],partner:null,candy:0,items:[],wear:{},adj:{},hist:[],streak:{last:null,n:0},pendingUp:false,pin:'0000',rev:0,msgs:[],stamps:{set:0,pin:0},best:{},pracHist:[],skill:{},pracCandy:{date:'',n:0},cards:{},grad:[],dojang:{n:0,board:[],eggs:0,init:false},mig2:false,forest:null,met:{},trades:[]};}
+function defaults(){return {v:2,set:{cur:9,step:1,review:[1,3,4,5,6,7,8],off:[],auto:'approve',counts:[8,8,8,8,8],limit:0,pool:'both',order:'big',memo:true,t3h:true,redo:true,pracRange:'open',sem:'3-2',semLock:true,ahead:false,forestN:20,pracMax:20,pracAfter:false,cardOff:[]},today:null,col:[],partner:null,candy:0,items:[],wear:{},adj:{},hist:[],streak:{last:null,n:0},pendingUp:false,pin:'0000',rev:0,msgs:[],stamps:{set:0,pin:0},best:{},pracHist:[],skill:{},pracCandy:{date:'',n:0},cards:{},grad:[],dojang:{n:0,board:[],eggs:0,init:false},mig2:false,forest:null,met:{},trades:[]};}
 function load(){
   let s=null;try{s=JSON.parse(localStorage.getItem(KEY));}catch(e){}
   return normalize(s,true);
@@ -2157,7 +2178,12 @@ function normalize(s,local){
   for(const k in d.set)if(s.set[k]===undefined)s.set[k]=d.set[k];
   /* 4스테이지(다르게 풀기) 시절 저장값 정리 */
   if(!Array.isArray(s.set.counts)||s.set.counts.length!==5)s.set.counts=d.set.counts.slice();
-  s.set.counts[2]=8;  /* v2.1: 다르게 풀기 카드 스테이지는 8문제로 고정 */
+  /* v2.20 개울 건너기(카드) 문제 수는 6·8·10 중 하나 (통과 기준 5·7·9) */
+  if(![6,8,10].includes(s.set.counts[2]))s.set.counts[2]=8;
+  if(!Array.isArray(s.set.cardOff))s.set.cardOff=[];
+  /* v2.20 예전 거꾸로 풀기 카드(9f·10f)가 오늘 개울 건너기에 있고 아직 시작 전이면 새 카드로 바꿈 */
+  if(s.today&&!s.today.done&&s.today.stages){const st=s.today.stages.find(x=>x.key==='today2');
+    if(st&&C.RETIRED.includes(st.card)&&!st.idx&&!st.stars){const nid=st.card+'2';st.card=nid;st.probs=st.probs.map(()=>C.makeCard(nid));}}
   if(s.today&&!s.today.done&&s.today.stages&&s.today.stages.some(x=>x.key==='alt'||x.key==='today'))s.today=null;
   /* 스테이지 이름 바꾸기 (워밍업→몸풀기 등) */
   const NM={warm:'신발 끈 묶기',today1:'꽃길 산책',today2:'개울 건너기',today3:'언덕 오르기',review:'기억 열매 따기'};
@@ -2211,8 +2237,8 @@ function save(){
    웹앱 버전(BUILD='web')에서만 동작. 테스트판(claude 링크)과 공개 출시판에서는 꺼짐.
    가족 코드는 이 기기에만 저장되고, 서버에는 코드의 해시(암호화된 지문)만 저장됨. */
 const BUILD='web';
-const APP_VER='2.19 · 2026-10-29';
-const APP_BUILD='2b1f753e59';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
+const APP_VER='2.20 · 2026-11-03';
+const APP_BUILD='84552f8bd7';  /* 웹앱 빌드 때 build.py가 빌드 번호를 넣음 */
 const SYNC_DEFAULT={"url": "https://mupsdurscfkbuptmsxtr.supabase.co", "key": "sb_publishable_3Wa_MeVRfkQI0JEysg2PZA_F6PfrZQ8"};
 const SKEY='numforest-sync';
 const SYNC={
@@ -2355,17 +2381,21 @@ function mistSummary(){const m={};state.hist.slice(-14).forEach(h=>{for(const k 
 /* ---------- 다르게 풀기 카드 진행 (스티커) ---------- */
 function lvCards(lv){return C.LVCARDS[lv]||[];}
 function hasSticker(id){return !!(state.cards&&state.cards[id]);}
-function cardsDone(lv){return lvCards(lv).every(hasSticker);}
-const STICKER_N=n=>Math.max(1,Math.ceil(n*7/8));   /* 8문제 중 7개 */
+/* v2.20 엄마가 끈 카드는 개울 건너기에 안 나오고 졸업 조건에서도 빠짐 */
+function cardOn(id){return !(state.set.cardOff||[]).includes(id)&&!C.RETIRED.includes(id);}
+function activeCards(lv){return lvCards(lv).filter(cardOn);}
+function cardsDone(lv){return activeCards(lv).every(hasSticker);}
+const STICKER_N=n=>Math.max(1,Math.round(n*7/8));   /* 6문제 5개 · 8문제 7개 · 10문제 9개 */
 /* 다지기 모드: 이번 학기 마지막 레벨까지 졸업해서 더 올라갈 레벨이 없을 때 */
 function isDaji(){const s=state.set;return state.grad.includes(s.cur)&&!C.nextLevel(s);}
 function cardPlan(){
   const s=state.set,opt={rev:[]};
   s.review.forEach(l=>(C.RVCARDS[l]||[]).forEach(id=>opt.rev.push(id)));
   Object.keys(state.cards||{}).forEach(id=>{if(C.CARDS[id]&&!opt.rev.includes(id))opt.rev.push(id);});
-  if(isDaji()){const lv=C.semLevels(s);opt.daji=lv;opt.mix=[].concat(...lv.map(l=>lvCards(l).filter(hasSticker)));if(!opt.mix.length)opt.mix=[].concat(...lv.map(lvCards));return opt;}
-  const todo=C.cardsFor(s.cur,s.step).find(id=>!hasSticker(id));
-  if(todo)opt.card=todo;else{const done=lvCards(s.cur).filter(hasSticker);if(done.length)opt.mix=done;}
+  opt.rev=opt.rev.filter(cardOn);
+  if(isDaji()){const lv=C.semLevels(s);opt.daji=lv;opt.mix=[].concat(...lv.map(l=>activeCards(l).filter(hasSticker)));if(!opt.mix.length)opt.mix=[].concat(...lv.map(activeCards));return opt;}
+  const todo=C.cardsFor(s.cur,s.step).filter(cardOn).find(id=>!hasSticker(id));
+  if(todo)opt.card=todo;else{const done=activeCards(s.cur).filter(hasSticker);if(done.length)opt.mix=done;}
   return opt;
 }
 function newToday(){
@@ -3739,9 +3769,12 @@ function renderParent(){
       <td>${ready?`<button type="button" class="btn sm" data-pv="${L.lv}">보기</button>`:''}</td></tr>`;
   });
   $('lvTable').innerHTML=rows;
+  // 개울 건너기 카드 켜기·끄기
+  {const lc=lvCards(s.cur);$('cardOffList').innerHTML=lc.length?lc.map(id=>{const d=C.CARDS[id],on=cardOn(id);
+    return `<label><input type="checkbox" data-coff="${id}" ${on?'checked':''} style="width:22px;height:22px;accent-color:var(--grass-deep)"> ${esc(d.name)} <span class="tag">(${d.step}단계 · ${hasSticker(id)?'통과':s.step>=d.step?'도전 중':'아직 안 열림'}${on?'':' · 꺼짐'})</span></label>`;}).join(''):'<p class="note">지금 레벨에는 다르게 풀기 카드가 없어요.</p>';}
   // 분량
   const names=['신발 끈 묶기','꽃길 산책','개울 건너기','언덕 오르기','기억 열매 따기'];
-  $('cntRows').innerHTML=names.map((n,i)=>(i===2?`<div class="row"><label>${i+1}. ${n}</label><span class="cnt"><b>8</b></span><span class="tag">문제 (다르게 풀기 카드는 8문제로 고정)</span></div>`:`<div class="row"><label>${i+1}. ${n}</label><span class="cnt"><button type="button" class="btn sm" data-cnt="${i}" data-d="-1" aria-label="${n} 줄이기">−</button><b>${s.counts[i]}</b><button type="button" class="btn sm" data-cnt="${i}" data-d="1" aria-label="${n} 늘리기">+</button></span><span class="tag">문제</span></div>`)).join('');
+  $('cntRows').innerHTML=names.map((n,i)=>(i===2?`<div class="row"><label>${i+1}. ${n}</label><span class="seg" id="cnt2Seg">${[6,8,10].map(v=>`<button type="button" class="${s.counts[2]===v?'on':''}" data-c2="${v}">${v}</button>`).join('')}</span><span class="tag">문제 (카드 통과: ${Math.round(s.counts[2]*7/8)}개 이상 한 번에)</span></div>`:`<div class="row"><label>${i+1}. ${n}</label><span class="cnt"><button type="button" class="btn sm" data-cnt="${i}" data-d="-1" aria-label="${n} 줄이기">−</button><b>${s.counts[i]}</b><button type="button" class="btn sm" data-cnt="${i}" data-d="1" aria-label="${n} 늘리기">+</button></span><span class="tag">문제</span></div>`)).join('');
   $('cntTotal').textContent='하루 총 '+s.counts.reduce((a,b)=>a+b,0)+'문제 (바꾼 분량은 내일 미션부터 적용)';
   $('limitSel').value=String(s.limit);
   document.querySelectorAll('input[name=order]').forEach(r=>r.checked=r.value===s.order);
@@ -3784,8 +3817,12 @@ $('lvTable').addEventListener('click',e=>{
   $('previewBox').hidden=false;$('previewBox').innerHTML=`<b>${lvName(l)} 예시</b><br>`+lines.map(esc).join('<br>');
 });
 $('applyToday').onclick=e=>armBtn(e.currentTarget,()=>{newToday();toast('오늘 미션을 새로 만들었어요');renderParent();},'오늘 진행이 처음부터 다시 시작돼요. 한 번 더 누르기');
-$('cntRows').addEventListener('click',e=>{const b=e.target.closest('[data-cnt]');if(!b)return;const i=+b.dataset.cnt,s=state.set;if(i===2)return;s.counts[i]=Math.max(4,Math.min(15,s.counts[i]+(+b.dataset.d)));save();renderParent();});
+$('cntRows').addEventListener('click',e=>{const c2=e.target.closest('[data-c2]');if(c2){state.set.counts[2]=+c2.dataset.c2;save();toast('개울 건너기를 '+c2.dataset.c2+'문제로 바꿨어요 (내일 미션부터)');renderParent();return;}
+  const b=e.target.closest('[data-cnt]');if(!b)return;const i=+b.dataset.cnt,s=state.set;if(i===2)return;s.counts[i]=Math.max(4,Math.min(15,s.counts[i]+(+b.dataset.d)));save();renderParent();});
 $('limitSel').onchange=e=>{state.set.limit=+e.target.value;save();};
+$('cardOffList').addEventListener('change',e=>{const id=e.target.dataset&&e.target.dataset.coff;if(!id)return;const off=new Set(state.set.cardOff||[]);
+  if(e.target.checked)off.delete(id);else off.add(id);state.set.cardOff=[...off];save();
+  toast((e.target.checked?'켰어요: ':'껐어요: ')+C.CARDS[id].name+' (내일 미션부터)');renderParent();});
 $('pracRadios').onchange=e=>{state.set.pracRange=e.target.value;save();};
 $('pracMaxSel').onchange=()=>{state.set.pracMax=+$('pracMaxSel').value;save();toast(pracMax()?'연습 별을 하루 '+pracMax()+'개까지 받아요':'연습 별 제한을 없앴어요');};
 $('pracAfterChk').onchange=()=>{state.set.pracAfter=$('pracAfterChk').checked;save();toast(state.set.pracAfter?'오늘의 미션을 끝낸 뒤에만 연습 별을 받아요':'미션 전에도 연습 별을 받아요');};
@@ -3934,7 +3971,7 @@ function renderReport(){
   const hc={};state.hist.forEach(h=>{if(h.card&&h.card.id&&h.card.id!=='mix'){(hc[h.card.id]=hc[h.card.id]||[]).push(h.card);}});
   if(t.done===false){const cs=t.stages.find(x=>x.key==='today2');if(cs&&cs.card&&cs.card!=='mix'&&cs.stars>0)(hc[cs.card]=hc[cs.card]||[]).push({first:cs.first,n:cs.probs.length});}
   $('repCards').innerHTML=lc.length?`<table><tr><th>카드</th><th>열리는 단계</th><th>통과</th><th>도전</th><th>최근 결과</th></tr>${lc.map(id=>{const d=C.CARDS[id],tr=hc[id]||[],last=tr[tr.length-1];
-      return `<tr class="${hasSticker(id)?'':'wait'}"><td>${esc(d.name)}</td><td>${d.step}단계</td><td>${hasSticker(id)?'통과 ('+state.cards[id].d.slice(5).replace('-','/')+')':s.step>=d.step?'도전 중':'아직 안 열림'}</td><td>${tr.length}번</td><td>${last?last.first+'/'+last.n:'-'}</td></tr>`;}).join('')}</table>`:'<p class="note">지금 레벨에는 다르게 풀기 카드가 없어요.</p>';
+      return `<tr class="${hasSticker(id)?'':'wait'}"><td>${esc(d.name)}</td><td>${d.step}단계</td><td>${!cardOn(id)?'엄마가 끔':hasSticker(id)?'통과 ('+state.cards[id].d.slice(5).replace('-','/')+')':s.step>=d.step?'도전 중':'아직 안 열림'}</td><td>${tr.length}번</td><td>${last?last.first+'/'+last.n:'-'}</td></tr>`;}).join('')}</table>`:'<p class="note">지금 레벨에는 다르게 풀기 카드가 없어요.</p>';
   // 연습
   const PH=state.pracHist.slice(-5).reverse(),KN={free:'자유 연습',grow:'실력 쑥쑥',time:'시간 도전'};
   const bests=Object.keys(state.best).filter(k=>/^tt(60|120)_/.test(k)).map(k=>{const m=k.match(/^tt(60|120)_(.+)$/);return `${m[1]==='60'?'1분':'2분'} · ${m[2]==='mix'?'골고루 섞기':C.LEVELS[+m[2]].name} ${state.best[k]}문제`;});
